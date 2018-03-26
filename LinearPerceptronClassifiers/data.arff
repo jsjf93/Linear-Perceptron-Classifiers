@@ -1,0 +1,15 @@
+@relation TrainingData
+
+@attribute x1 numeric
+@attribute x2 numeric
+@attribute t numeric
+
+@data
+6,2,-1
+-2,5,1
+0,4,1
+1,-6,-1
+-3,-4,-1
+10,0,-1
+0,-6,-1
+4,-7,-1
