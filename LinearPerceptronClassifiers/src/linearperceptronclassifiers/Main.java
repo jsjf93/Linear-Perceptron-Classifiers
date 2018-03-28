@@ -11,11 +11,17 @@ import weka.core.Instances;
  */
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // Load data
         Instances train = loadData("data.arff");
-        System.out.println(train.numAttributes());
-        //
+        // Create instance of LinearPerceptron classifer
+        LinearPerceptron linearPerceptron = new LinearPerceptron();
+        // Build classifier
+        linearPerceptron.buildClassifier(train);
+        // Classify instances
+        for(int i = 0; i < train.numInstances(); i++){
+            linearPerceptron.classifyInstance(train.instance(i));
+        }
     }
     
     /**
