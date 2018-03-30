@@ -14,13 +14,25 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // Load data
         Instances train = loadData("data.arff");
+        Instances test = loadData("RandomTestData.arff");
+        
         // Create instance of LinearPerceptron classifer
-        LinearPerceptron linearPerceptron = new LinearPerceptron();
+        /*LinearPerceptron linearPerceptron = new LinearPerceptron();
         // Build classifier
         linearPerceptron.buildClassifier(train);
         // Classify instances
+        for(int i = 0; i < test.numInstances(); i++){
+            linearPerceptron.classifyInstance(test.instance(i));
+        }
+        */
+        // Create instance of EnhancedLinearPerceptron classifer
+        boolean standardise = true;
+        EnhancedLinearPerceptron eln = new EnhancedLinearPerceptron(standardise);
+        // Build classifier
+        eln.buildClassifier(train);
+        // Classify instances
         for(int i = 0; i < train.numInstances(); i++){
-            linearPerceptron.classifyInstance(train.instance(i));
+            eln.classifyInstance(train.instance(i));
         }
     }
     
@@ -35,6 +47,7 @@ public class Main {
         try{
             FileReader fr = new FileReader(path);
             i = new Instances(fr);
+            i.setClassIndex(i.numAttributes()-1);
         }
         catch(Exception e){
             System.out.println("Unable to read file. Exception: " + e);
