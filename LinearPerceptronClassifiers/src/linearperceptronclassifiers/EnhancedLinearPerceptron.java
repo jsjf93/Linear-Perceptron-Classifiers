@@ -1,7 +1,9 @@
 /*
  * An implementation of the standard online Linear Peceptron classifer and the
  * offline Perceptron algorithm
- * 
+
+ * REMEMBER TO CHECK TERNARY OPERATION AND DELETE COMMENTED CODE
+ * Might be able to reduce code a bit by not passing w[] to methods
  * It implements the Weka Classifier interface.
  */
 package linearperceptronclassifiers;
@@ -10,7 +12,6 @@ import weka.classifiers.Classifier;
 import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Standardize;
 
 /**
@@ -22,7 +23,8 @@ public class EnhancedLinearPerceptron implements Classifier{
     private final static int ETA = 1; // Variable for learning rate
     private final int MAX_ITERATIONS = 100;
     private final boolean STANDARDISE_FLAG;
-    private Standardize filter;
+    private double[] means;
+    private double[] stdDev;
     
     /**
      *  Default constructor for the LinearPerceptron classifier
@@ -31,7 +33,6 @@ public class EnhancedLinearPerceptron implements Classifier{
         this.w = new double[]{1, 1};
         this.bias = 0;
         this.STANDARDISE_FLAG = false;
-        this.filter = null;
     }
     
     /**
@@ -53,9 +54,6 @@ public class EnhancedLinearPerceptron implements Classifier{
         this.w = new double[]{1, 1};
         this.bias = 0;
         this.STANDARDISE_FLAG = standardiseFlag;
-        if(standardiseFlag){
-            this.filter = new Standardize();
-        }
     }
     
     /**
@@ -68,9 +66,6 @@ public class EnhancedLinearPerceptron implements Classifier{
         this.w = new double[]{1, 1};
         this.bias = bias;
         this.STANDARDISE_FLAG = standardiseFlag;
-        if(standardiseFlag){
-            this.filter = new Standardize();
-        }
     }
 
     @Override
@@ -81,45 +76,28 @@ public class EnhancedLinearPerceptron implements Classifier{
         
         // Standardise if flag = true
         if(STANDARDISE_FLAG){
+            getMeans(train);
+            getStandardDeviation(train);
             train = standardiseAttributes(train);
         }
+        // Run the on-line Perceptron training algorithm
+        perceptronTraining(train);
         
-        // Initialise count; used to check that a full pass has been made 
-        // through the dataset without a change in y or w
-        int count = 0;
-        int iterations = 0;
-        
-        do{
-            // Loop through each row of the data
-            for(int i = 0; i < train.numInstances(); i++){
-                // Determine y
-                double y = calculateY(w, train.instance(i));
-                // Calculate new weights
-                double[] tempWeights = calculateWeights(w, train.instance(i), y);
-                // Check that weights haven't changed
-                if(tempWeights[0] == w[0] && tempWeights[1] == w[1]) count++;
-                else count = 0;
-                // Assign temporary weights to w[]
-                w[0] = tempWeights[0];
-                w[1] = tempWeights[1];
-                // Increment the number of iterations
-                iterations++;
-            }
-        } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
+        // Run the off-line Perceptron training algorithm
         
     }
 
     @Override
-    public double classifyInstance(Instance i) throws Exception {
+    public double classifyInstance(Instance instance) throws Exception {
         // Standardise attributes if flag = true
         if(STANDARDISE_FLAG){
-            filter.input(i);
-            filter.batchFinished();
-            i = filter.output();
+            for(int i = 0; i < instance.numAttributes(); i++){
+                instance.setValue(i, instance.value(i) - means[i] / stdDev[i]);
+            }
         }
         // Get the class of the instance
-        double y = calculateY(w, i);
-        System.out.println("Pred: " + y + ". Actual: " + i.value(2));
+        double y = calculateY(w, instance);
+        System.out.println("Pred: " + y + ". Actual: " + instance.value(2));
         return y;
     }
 
@@ -176,16 +154,104 @@ public class EnhancedLinearPerceptron implements Classifier{
     }
     
     /**
-     * Applies a Standardise filter so each attribute has zero mean and
-     * standard deviation one
-     * @param instances
-     * @return instances with standardised attributes
-     * @throws Exception 
+     * An implementation of the on-line perceptron training algorithm
+     * @param train
      */
-    private Instances standardiseAttributes(Instances instances) throws Exception{
-        filter.setInputFormat(instances);
-        Instances filtered = Filter.useFilter(instances, filter);
-        return filtered;
+    private void perceptronTraining(Instances train){
+        // Initialise count; used to check that a full pass has been made 
+        // through the dataset without a change in y or w
+        int count = 0;
+        int iterations = 0;
+        
+        do{
+            // Loop through each row of the data
+            for(int i = 0; i < train.numInstances(); i++){
+                // Calculate y
+                double y = calculateY(w, train.instance(i));
+                // Calculate new weights and store in temporary array
+                double[] tw = calculateWeights(w, train.instance(i), y);
+                // Check that weights haven't changed
+                //if(tempWeights[0] == w[0] && tempWeights[1] == w[1]) count++;
+                //else count = 0;
+                count = (tw[0]==w[0] && tw[1]==w[1]) ? count+1 : count*0;
+                // Assign temporary weights to w[]
+                w[0] = tw[0];
+                w[1] = tw[1];
+                // Increment the number of iterations
+                iterations++;
+            }
+        } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
     
+    
+    
+    private void gradientDescentTraining(Instances train){
+        // Initialise count; qused to check that a full pass has been made 
+        // through the dataset without a change in y or w
+        int count = 0;
+        int iterations = 0;
+        
+        do{
+            // Initialise delta w to zeroes
+            double dw[] = new double[]{0,0};
+            for(int i = 0; i < train.numInstances(); i++){
+                Instance in = train.instance(i);
+                // Calculate y
+                double y = calculateY(w, in);
+                // Calculate deltaW
+                for(int j = 0; j < dw.length; j++){
+                    dw[j] = dw[j] + (0.5*ETA) *  (in.value(2) - y) * in.value(0);
+                }
+            }
+            // Update weights
+            for(int j = 0; j < dw.length; j++){
+                w[j] = w[j] + dw[j];
+            }
+        } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
+    }
+    
+    
+    private void getMeans(Instances train){
+        means = new double[train.numAttributes()];
+        // Loop through each column (attribute)
+        for(int i = 0; i < train.numAttributes(); i++){
+            // Get the sum of the attribute for each instance
+            for(int j = 0; j < train.numInstances(); j++){
+                means[i] += train.get(j).value(i);
+            }
+            // Divide by the number of instances to get the attribute mean
+            means[i] /= train.numInstances();
+        }
+    }
+    
+    private void getStandardDeviation(Instances train){
+        stdDev = new double[train.numAttributes()];
+        // Calculate variance
+        // Loop through each column (attribute)
+        for(int i = 0; i < train.numAttributes(); i++){
+            // Loop through each instance value of attribute i
+            for(int j = 0; j < train.numInstances(); j++){
+                stdDev[i] += (train.get(j).value(i) - means[i]) * 
+                             (train.get(j).value(i) - means[i]);
+            }
+            // Get the variance for stdDev[i]
+            stdDev[i] /= train.numInstances()-1;
+        }
+        // Calculate standard deviation
+        for(int i = 0; i < stdDev.length; i++){
+            stdDev[i] = Math.sqrt(stdDev[i]);
+        }
+    }
+    
+    private Instances standardiseAttributes(Instances train){
+        // Loop through each column (attribute)
+        for(int i = 0; i < train.numAttributes(); i++){
+            // Loop through each instance value of attribute i
+            for(int j = 0; j < train.numInstances(); j++){
+                train.get(j).setValue(i, (train.get(j).value(i) - means[i]) / 
+                        stdDev[i]);
+            }
+        }
+        return train;
+    }
 }

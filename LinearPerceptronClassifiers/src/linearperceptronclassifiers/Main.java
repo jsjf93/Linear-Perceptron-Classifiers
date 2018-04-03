@@ -16,15 +16,17 @@ public class Main {
         Instances train = loadData("data.arff");
         Instances test = loadData("RandomTestData.arff");
         
+        System.out.println("Linear Perceptron: \n");
         // Create instance of LinearPerceptron classifer
-        /*LinearPerceptron linearPerceptron = new LinearPerceptron();
+        LinearPerceptron linearPerceptron = new LinearPerceptron();
         // Build classifier
         linearPerceptron.buildClassifier(train);
         // Classify instances
-        for(int i = 0; i < test.numInstances(); i++){
-            linearPerceptron.classifyInstance(test.instance(i));
+        for(int i = 0; i < train.numInstances(); i++){
+            linearPerceptron.classifyInstance(train.instance(i));
         }
-        */
+        
+        System.out.println("\nEnhanced Linear Perceptron: \n");
         // Create instance of EnhancedLinearPerceptron classifer
         boolean standardise = true;
         EnhancedLinearPerceptron eln = new EnhancedLinearPerceptron(standardise);
