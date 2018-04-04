@@ -91,9 +91,10 @@ public class EnhancedLinearPerceptron implements Classifier{
     public double classifyInstance(Instance instance) throws Exception {
         // Standardise attributes if flag = true
         if(STANDARDISE_FLAG){
-            for(int i = 0; i < instance.numAttributes(); i++){
-                instance.setValue(i, instance.value(i) - means[i] / stdDev[i]);
+            for(int i = 0; i < instance.numAttributes()-1; i++){
+                instance.setValue(i, (instance.value(i) - means[i]) / stdDev[i]);
             }
+            //System.out.println(instance);
         }
         // Get the class of the instance
         double y = calculateY(w, instance);
@@ -212,9 +213,9 @@ public class EnhancedLinearPerceptron implements Classifier{
     
     
     private void getMeans(Instances train){
-        means = new double[train.numAttributes()];
+        means = new double[train.numAttributes()-1];
         // Loop through each column (attribute)
-        for(int i = 0; i < train.numAttributes(); i++){
+        for(int i = 0; i < train.numAttributes()-1; i++){
             // Get the sum of the attribute for each instance
             for(int j = 0; j < train.numInstances(); j++){
                 means[i] += train.get(j).value(i);
@@ -225,10 +226,10 @@ public class EnhancedLinearPerceptron implements Classifier{
     }
     
     private void getStandardDeviation(Instances train){
-        stdDev = new double[train.numAttributes()];
+        stdDev = new double[train.numAttributes()-1];
         // Calculate variance
         // Loop through each column (attribute)
-        for(int i = 0; i < train.numAttributes(); i++){
+        for(int i = 0; i < train.numAttributes()-1; i++){
             // Loop through each instance value of attribute i
             for(int j = 0; j < train.numInstances(); j++){
                 stdDev[i] += (train.get(j).value(i) - means[i]) * 
@@ -245,7 +246,7 @@ public class EnhancedLinearPerceptron implements Classifier{
     
     private Instances standardiseAttributes(Instances train){
         // Loop through each column (attribute)
-        for(int i = 0; i < train.numAttributes(); i++){
+        for(int i = 0; i < train.numAttributes()-1; i++){
             // Loop through each instance value of attribute i
             for(int j = 0; j < train.numInstances(); j++){
                 train.get(j).setValue(i, (train.get(j).value(i) - means[i]) / 
