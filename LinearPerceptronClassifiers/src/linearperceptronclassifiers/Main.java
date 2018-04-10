@@ -28,8 +28,9 @@ public class Main {
         
         System.out.println("\nEnhanced Linear Perceptron: \n");
         // Create instance of EnhancedLinearPerceptron classifer
+        double bias = -1;
         boolean standardise = true;
-        EnhancedLinearPerceptron eln = new EnhancedLinearPerceptron(standardise);
+        EnhancedLinearPerceptron eln = new EnhancedLinearPerceptron(bias, standardise);
         // Build classifier
         eln.buildClassifier(train);
         // Classify instances
