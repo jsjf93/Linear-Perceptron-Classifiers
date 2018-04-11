@@ -26,17 +26,49 @@ public class Main {
             linearPerceptron.classifyInstance(train.instance(i));
         }
         
-        System.out.println("\nEnhanced Linear Perceptron: \n");
+        System.out.println("\nEnhanced Linear Perceptron (online, no standardisation): \n");
         // Create instance of EnhancedLinearPerceptron classifer
-        double bias = -1;
-        boolean standardise = true;
-        EnhancedLinearPerceptron eln = new EnhancedLinearPerceptron(bias, standardise);
+        double bias = 0;
+        boolean standardise = false;
+        boolean onlineRule = true;
+        EnhancedLinearPerceptron eln = new EnhancedLinearPerceptron(bias, standardise, onlineRule);
         // Build classifier
         eln.buildClassifier(train);
         // Classify instances
         for(int i = 0; i < train.numInstances(); i++){
             eln.classifyInstance(train.instance(i));
         }
+        
+        System.out.println("\nEnhanced Linear Perceptron (online, standardisation): \n");
+        // Create instance of EnhancedLinearPerceptron classifer
+        bias = -0.5;
+        standardise = true;
+        onlineRule = true;
+        EnhancedLinearPerceptron eln1 = new EnhancedLinearPerceptron(bias, standardise, onlineRule);
+        // Build classifier
+        eln1.buildClassifier(train);
+        // Classify instances
+        for(int i = 0; i < train.numInstances(); i++){
+            eln1.classifyInstance(train.instance(i));
+        }
+        
+        System.out.println("\nEnhanced Linear Perceptron (off-line): \n");
+        // Create instance of EnhancedLinearPerceptron classifer
+        bias = 0;
+        standardise = false;
+        onlineRule = false;
+        EnhancedLinearPerceptron eln2 = new EnhancedLinearPerceptron(bias, standardise, onlineRule);
+        // Build classifier
+        eln2.buildClassifier(train);
+        // Classify instances
+        for(int i = 0; i < train.numInstances(); i++){
+            eln2.classifyInstance(train.instance(i));
+        }
+        
+        EnhancedLinearPerceptron modelSelection = new EnhancedLinearPerceptron(true);
+        modelSelection.buildClassifier(train);
+        
+        
     }
     
     /**

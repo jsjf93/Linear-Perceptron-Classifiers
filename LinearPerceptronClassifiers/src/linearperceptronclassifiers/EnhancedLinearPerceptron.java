@@ -8,7 +8,10 @@
  */
 package linearperceptronclassifiers;
 
+import java.io.Serializable;
+import java.util.Random;
 import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
 import weka.core.AttributeStats;
 import weka.core.Capabilities;
 import weka.core.Instance;
@@ -17,12 +20,14 @@ import weka.core.Instances;
 /**
  * @author Joshua Foster
  */
-public class EnhancedLinearPerceptron implements Classifier{
+public class EnhancedLinearPerceptron implements Classifier, Serializable{
     private double[] w; // Variable for weights
     private double bias;
     private final static int ETA = 1; // Variable for learning rate
     private final int MAX_ITERATIONS = 100;
-    private final boolean STANDARDISE_FLAG;
+    private boolean STANDARDISE_FLAG;
+    private boolean ONLINE_RULE;
+    private boolean MODEL_SELECTION;
     private double[] means;
     private double[] stdDev;
     
@@ -33,6 +38,8 @@ public class EnhancedLinearPerceptron implements Classifier{
         this.w = new double[]{1, 1};
         this.bias = 0;
         this.STANDARDISE_FLAG = false;
+        this.ONLINE_RULE = true;
+        this.MODEL_SELECTION = false;
     }
     
     /**
@@ -43,17 +50,19 @@ public class EnhancedLinearPerceptron implements Classifier{
         this.w = new double[]{1, 1};
         this.bias = bias;
         this.STANDARDISE_FLAG = false;
+        this.ONLINE_RULE = true;
+        this.MODEL_SELECTION = false;
     }
     
     /**
-     * A constructor that allows the user to specify if instances 
-     * should be standardised using standardiseFlag
-     * @param standardiseFlag 
+     * A constructor that allows the user to specify if model selection should
+     * be used
+     * @param modelSelection 
      */
-    public EnhancedLinearPerceptron(boolean standardiseFlag) {
-        this.w = new double[]{-0.5999067136984317, 1.929693104359004};
+    public EnhancedLinearPerceptron(boolean modelSelection) {
+        this.w = new double[]{1, 1};
         this.bias = 0;
-        this.STANDARDISE_FLAG = standardiseFlag;
+        this.MODEL_SELECTION = modelSelection;
     }
     
     /**
@@ -61,30 +70,46 @@ public class EnhancedLinearPerceptron implements Classifier{
      * if instances should be standardised using standardiseFlag
      * @param bias 
      * @param standardiseFlag 
+     * @param onlineRule 
      */
-    public EnhancedLinearPerceptron(double bias, boolean standardiseFlag) {
+    public EnhancedLinearPerceptron(double bias, boolean standardiseFlag, boolean onlineRule) {
         this.w = new double[]{1, 1};
         this.bias = bias;
         this.STANDARDISE_FLAG = standardiseFlag;
+        this.ONLINE_RULE = onlineRule;
     }
 
     @Override
     public void buildClassifier(Instances train) throws Exception {
-        // To do: check that instances are continuous and not discrete
+        Instances instances;
+        // To do: check that attributes are continuous and not discrete
         
         
-        // Standardise if flag = true
-        if(STANDARDISE_FLAG){
-            train = standardise(train);
+        
+        if(MODEL_SELECTION){
+            Instances newData = train;
+            
+            // Online
+            EnhancedLinearPerceptron online = new EnhancedLinearPerceptron();
+            // Offline
+            EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
         }
-
-        //System.out.println(train);
-        //System.out.println("");
+        else{
+            // Standardise attributes if flag is set to true, assign train to
+            // instances otherwise
+            instances = (STANDARDISE_FLAG) ? standardiseAttributes(train) : train;
+            // Run the on-line perceptron algorithm if flag is true, otherwise use
+            // the off-line algorithm
+            if(ONLINE_RULE){
+                perceptronTraining(instances);
+            }
+            else{
+                gradientDescentTraining(instances);
+            }
+        }
         
-        // Run the on-line Perceptron training algorithm
-        perceptronTraining(train);
-        
-        // Run the off-line Perceptron training algorithm
+        System.out.println("Weights: " + w[0] + ", " + w[1]);
+        System.out.println("Bias: " + bias);
         
     }
 
@@ -100,7 +125,7 @@ public class EnhancedLinearPerceptron implements Classifier{
             double x2 = (instance.value(1) - means[1]) / stdDev[1];
             double calc = w[0] * x1 + w[1] * x2 + bias;
             y = (calc >= 0) ? 1 : -1;
-            //System.out.println(instance);
+            //System.out.println("Calc = " + calc + ". y = " + y);
         }
         else {
             y = calculateY(instance);
@@ -122,7 +147,7 @@ public class EnhancedLinearPerceptron implements Classifier{
     }
     
     /**
-     * Return the y value (either 1 or 0) using a threshold of 0
+     * Return the y value (either 1 or -1) using a threshold of 0
      * @param i the current instance in the training data
      * @return 1 or -1
      */
@@ -143,11 +168,9 @@ public class EnhancedLinearPerceptron implements Classifier{
      */
     private double[] calculateWeights(Instance i, double y){
         double tw[] = new double[2]; // temporary weights
-        System.out.println("Calculation: ");
-        System.out.println("tw[0] = " + w[0] + " + 0.5 * (" + i.value(2) + " - " + y + ") * " + i.value(0));
         tw[0] = w[0] + (0.5*ETA) * (i.value(2) - y) * i.value(0);
         tw[1] = w[1] + (0.5*ETA) * (i.value(2) - y) * i.value(1);
-        //bias = (0.5*ETA) * (i.value(2) - y);
+        bias = bias + (0.5*ETA) * (i.value(2) - y);
         return tw;   
     }
     
@@ -166,10 +189,8 @@ public class EnhancedLinearPerceptron implements Classifier{
             for(int i = 0; i < train.numInstances(); i++){
                 // Calculate y
                 double y = calculateY(train.instance(i));
-                //System.out.println(y);
                 // Calculate new weights and store in temporary array
                 double[] tw = calculateWeights(train.instance(i), y);
-                //System.out.println("tw: " + tw[0] + ", " + tw[1]);
                 // Check that weights haven't changed
                 count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
                 // Assign temporary weights to w[]
@@ -177,7 +198,6 @@ public class EnhancedLinearPerceptron implements Classifier{
                 w[1] = tw[1];
                 // Increment the number of iterations
                 iterations++;
-                //System.out.println("Count: " + count);
             }
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
@@ -199,88 +219,44 @@ public class EnhancedLinearPerceptron implements Classifier{
                 double y = calculateY(in);
                 // Calculate deltaW
                 for(int j = 0; j < dw.length; j++){
-                    dw[j] = dw[j] + (0.5*ETA) * (in.value(2) - y) * in.value(0);
+                    dw[j] = dw[j] + (0.5*ETA) * (in.value(2) - y) * in.value(j);
                 }
             }
             // Update weights
+            double[] tw = new double[2]; // temporary weights
             for(int j = 0; j < dw.length; j++){
-                w[j] = w[j] + dw[j];
+                tw[j] = w[j] + dw[j];
             }
+            // Check that weights haven't changed
+            count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
+            // Assign temporary weights to w[]
+            w[0] = tw[0];
+            w[1] = tw[1];
+            // Increment the number of iterations
+            iterations++;
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
     
-    /**
-     * Obtains the mean of each attribute column of the Instances provided
-     * @param train 
-     */
-    private void getMeans(Instances train){
-        means = new double[train.numAttributes()-1];
-        // Loop through each column (attribute)
-        for(int i = 0; i < train.numAttributes()-1; i++){
-            // Get the sum of the attribute for each instance
-            for(int j = 0; j < train.numInstances(); j++){
-                means[i] += train.get(j).value(i);
-            }
-            // Divide by the number of instances to get the attribute mean
-            means[i] /= train.numInstances();
-        }
-    }
-    
-    /**
-     * Obtains the standard deviation of each attribute column of the Instances
-     * provided
-     * @param train 
-     */
-    private void getStandardDeviation(Instances train){
-        stdDev = new double[train.numAttributes()-1];
-        // Calculate variance
-        // Loop through each column (attribute)
-        for(int i = 0; i < train.numAttributes()-1; i++){
-            // Loop through each instance value of attribute i
-            for(int j = 0; j < train.numInstances(); j++){
-                stdDev[i] += (train.get(j).value(i) - means[i]) * 
-                             (train.get(j).value(i) - means[i]);
-            }
-            // Get the variance for stdDev[i]
-            stdDev[i] /= train.numInstances();
-        }
-        // Calculate standard deviation
-        for(int i = 0; i < stdDev.length; i++){
-            stdDev[i] = Math.sqrt(stdDev[i]);
-        }
-    }
-    
-    /**
-     * Standardises each attribute value using the means and standard deviations
-     * calculated in the getMeans() and getStandardDeviation() methods
-     * @param train
-     * @return the instances with standardised attributes
-     */
     private Instances standardiseAttributes(Instances train){
-        // Loop through each column (attribute)
-        for(int i = 0; i < train.numAttributes()-1; i++){
-            // Loop through each instance value of attribute i
-            for(int j = 0; j < train.numInstances(); j++){
-                train.get(j).setValue(i, (train.get(j).value(i) - means[i]) / 
-                        stdDev[i]);
-            }
-        }
-        return train;
-    }
-    
-    private Instances standardise(Instances train){
+        Instances standardised = new Instances(train);
         means = new double[train.numAttributes()-1];
         stdDev = new double[train.numAttributes()-1];
         
-        for(int i = 0; i < train.numAttributes()-1; i++){
-            AttributeStats attributeStats = train.attributeStats(i);
+        for(int i = 0; i < standardised.numAttributes()-1; i++){
+            AttributeStats attributeStats = standardised.attributeStats(i);
             means[i] = attributeStats.numericStats.mean;
             stdDev[i] = attributeStats.numericStats.stdDev;
-            for(int j = 0; j < train.numInstances(); j++){
-                train.get(j).setValue(i, (train.get(j).value(i) - means[i]) / 
+            for(int j = 0; j < standardised.numInstances(); j++){
+                standardised.get(j).setValue(i, (standardised.get(j).value(i) - means[i]) / 
                         stdDev[i]);
             }
         }
-        return train;
+        return standardised;
+    }
+    
+    private double crossValidation(Instances instances){
+        int folds = 10;
+        double acc = 0, bestAcc = 0;
+        
     }
 }
