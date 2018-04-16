@@ -8,8 +8,8 @@
  */
 package linearperceptronclassifiers;
 
-import java.io.Serializable;
 import java.util.Random;
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.AttributeStats;
@@ -20,7 +20,7 @@ import weka.core.Instances;
 /**
  * @author Joshua Foster
  */
-public class EnhancedLinearPerceptron implements Classifier, Serializable{
+public class EnhancedLinearPerceptron extends AbstractClassifier{
     private double[] w; // Variable for weights
     private double bias;
     private final static int ETA = 1; // Variable for learning rate
@@ -80,36 +80,37 @@ public class EnhancedLinearPerceptron implements Classifier, Serializable{
     }
 
     @Override
-    public void buildClassifier(Instances train) throws Exception {
-        Instances instances;
+    public void buildClassifier(Instances instances) throws Exception {
+        Instances newInstances;
         // To do: check that attributes are continuous and not discrete
         
         
         
         if(MODEL_SELECTION){
-            Instances newData = train;
-            
-            // Online
+            // Create classifiers and Evaluation objects
             EnhancedLinearPerceptron online = new EnhancedLinearPerceptron();
-            // Offline
+            Evaluation evalOnline = new Evaluation(instances);
             EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
+            Evaluation evalOffline = new Evaluation(instances);
+            // Number of folds for crossvalidation
+            int folds = 8;
+            evalOnline.crossValidateModel(online, instances, folds, new Random(1));
+            
+            
         }
         else{
             // Standardise attributes if flag is set to true, assign train to
             // instances otherwise
-            instances = (STANDARDISE_FLAG) ? standardiseAttributes(train) : train;
+            newInstances = (STANDARDISE_FLAG) ? standardiseAttributes(instances) : instances;
             // Run the on-line perceptron algorithm if flag is true, otherwise use
             // the off-line algorithm
             if(ONLINE_RULE){
-                perceptronTraining(instances);
+                perceptronTraining(newInstances);
             }
             else{
-                gradientDescentTraining(instances);
+                gradientDescentTraining(newInstances);
             }
         }
-        
-        System.out.println("Weights: " + w[0] + ", " + w[1]);
-        System.out.println("Bias: " + bias);
         
     }
 
@@ -136,15 +137,29 @@ public class EnhancedLinearPerceptron implements Classifier, Serializable{
         return y;
     }
 
-    @Override
-    public double[] distributionForInstance(Instance instnc) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+//    @Override
+//    public double[] distributionForInstance(Instance instnc) throws Exception {
+//        //throw new UnsupportedOperationException("Not supported yet.");
+//        try{
+//            System.out.println("Needs doing");
+//        }
+//        catch(Exception e){
+//            System.out.println("Needs doing too");
+//        }
+//        return null;
+//    }
 
-    @Override
-    public Capabilities getCapabilities() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+//    @Override
+//    public Capabilities getCapabilities() {
+//        //throw new UnsupportedOperationException("Not supported yet.");
+//        try{
+//            System.out.println("Needs doing");
+//        }
+//        catch(Exception e){
+//            System.out.println("Needs doing too");
+//        }
+//        return null;
+//    }
     
     /**
      * Return the y value (either 1 or -1) using a threshold of 0
@@ -234,6 +249,7 @@ public class EnhancedLinearPerceptron implements Classifier, Serializable{
             w[1] = tw[1];
             // Increment the number of iterations
             iterations++;
+            System.out.println(iterations);
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
     
@@ -254,9 +270,9 @@ public class EnhancedLinearPerceptron implements Classifier, Serializable{
         return standardised;
     }
     
-    private double crossValidation(Instances instances){
+    /*private double crossValidation(Instances instances){
         int folds = 10;
         double acc = 0, bestAcc = 0;
         
-    }
+    }*/
 }

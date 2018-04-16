@@ -65,6 +65,7 @@ public class Main {
             eln2.classifyInstance(train.instance(i));
         }
         
+        System.out.println("\nModel Selection\n");
         EnhancedLinearPerceptron modelSelection = new EnhancedLinearPerceptron(true);
         modelSelection.buildClassifier(train);
         
