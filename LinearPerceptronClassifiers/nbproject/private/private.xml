@@ -3,8 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/Users/imac5/Documents/GitHub/Linear-Perceptron-Classifiers/LinearPerceptronClassifiers/src/linearperceptronclassifiers/EnhancedLinearPerceptron.java</file>
             <file>file:/Users/imac5/Documents/GitHub/Linear-Perceptron-Classifiers/LinearPerceptronClassifiers/src/linearperceptronclassifiers/Main.java</file>
+=======
+            <file>file:/C:/Users/Owner/Documents/GitHub/Linear-Perceptron-Classifiers/LinearPerceptronClassifiers/src/linearperceptronclassifiers/EnhancedLinearPerceptron.java</file>
+            <file>file:/C:/Users/Owner/Documents/GitHub/Linear-Perceptron-Classifiers/LinearPerceptronClassifiers/src/linearperceptronclassifiers/Main.java</file>
+>>>>>>> fb6977dd510a2b6a58947b47aae239efadcfd2cc
         </group>
     </open-files>
 </project-private>
