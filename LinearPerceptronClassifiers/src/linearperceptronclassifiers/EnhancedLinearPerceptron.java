@@ -90,10 +90,11 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             // Create classifiers and Evaluation objects
             EnhancedLinearPerceptron online = new EnhancedLinearPerceptron();
             Evaluation evalOnline = new Evaluation(instances);
-            EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
-            Evaluation evalOffline = new Evaluation(instances);
+            //EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
+            //Evaluation evalOffline = new Evaluation(instances);
             // Number of folds for crossvalidation
             int folds = 8;
+            // Cross-validate
             evalOnline.crossValidateModel(online, instances, folds, new Random(1));
             
             
@@ -119,9 +120,6 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         double y;
         // Standardise attributes if flag = true
         if(STANDARDISE_FLAG){
-            //for(int i = 0; i < instance.numAttributes()-1; i++){
-            //    instance.setValue(i, (instance.value(i) - means[i]) / stdDev[i]);
-           // }
             double x1 = (instance.value(0) - means[0]) / stdDev[0];
             double x2 = (instance.value(1) - means[1]) / stdDev[1];
             double calc = w[0] * x1 + w[1] * x2 + bias;
@@ -131,35 +129,9 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         else {
             y = calculateY(instance);
         }
-        
-        
         System.out.println("Pred: " + y + ". Actual: " + instance.value(2));
         return y;
     }
-
-//    @Override
-//    public double[] distributionForInstance(Instance instnc) throws Exception {
-//        //throw new UnsupportedOperationException("Not supported yet.");
-//        try{
-//            System.out.println("Needs doing");
-//        }
-//        catch(Exception e){
-//            System.out.println("Needs doing too");
-//        }
-//        return null;
-//    }
-
-//    @Override
-//    public Capabilities getCapabilities() {
-//        //throw new UnsupportedOperationException("Not supported yet.");
-//        try{
-//            System.out.println("Needs doing");
-//        }
-//        catch(Exception e){
-//            System.out.println("Needs doing too");
-//        }
-//        return null;
-//    }
     
     /**
      * Return the y value (either 1 or -1) using a threshold of 0
