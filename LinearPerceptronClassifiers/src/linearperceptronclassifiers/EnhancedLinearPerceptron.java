@@ -95,6 +95,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             Evaluation evalOffline = new Evaluation(instances);
             // Number of folds for crossvalidation
             int folds = 8;
+            // Cross-validate
             evalOnline.crossValidateModel(online, instances, folds, new Random(1));
             evalOffline.crossValidateModel(offline, instances, folds, new Random(1));
             //evalOnline.evaluateModel(online, instances);
@@ -129,9 +130,6 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         double y;
         // Standardise attributes if flag = true
         if(STANDARDISE_FLAG){
-            //for(int i = 0; i < instance.numAttributes()-1; i++){
-            //    instance.setValue(i, (instance.value(i) - means[i]) / stdDev[i]);
-           // }
             double x1 = (instance.value(0) - means[0]) / stdDev[0];
             double x2 = (instance.value(1) - means[1]) / stdDev[1];
             double calc = w[0] * x1 + w[1] * x2 + bias;
@@ -141,8 +139,6 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         else {
             y = calculateY(instance);
         }
-        
-        
         //System.out.println("Pred: " + y + ". Actual: " + instance.value(2));
         return y;
     }
