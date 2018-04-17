@@ -4,6 +4,7 @@
 package linearperceptronclassifiers;
 
 import java.io.FileReader;
+import weka.classifiers.Classifier;
 import weka.core.Instances;
 
 /**
@@ -35,9 +36,7 @@ public class Main {
         // Build classifier
         eln.buildClassifier(train);
         // Classify instances
-        for(int i = 0; i < train.numInstances(); i++){
-            eln.classifyInstance(train.instance(i));
-        }
+        testModel(eln, test);
         
         System.out.println("\nEnhanced Linear Perceptron (online, standardisation): \n");
         // Create instance of EnhancedLinearPerceptron classifer
@@ -48,9 +47,7 @@ public class Main {
         // Build classifier
         eln1.buildClassifier(train);
         // Classify instances
-        for(int i = 0; i < train.numInstances(); i++){
-            eln1.classifyInstance(train.instance(i));
-        }
+        testModel(eln1, test);
         
         System.out.println("\nEnhanced Linear Perceptron (off-line): \n");
         // Create instance of EnhancedLinearPerceptron classifer
@@ -61,15 +58,13 @@ public class Main {
         // Build classifier
         eln2.buildClassifier(train);
         // Classify instances
-        for(int i = 0; i < train.numInstances(); i++){
-            eln2.classifyInstance(train.instance(i));
-        }
+        testModel(eln2, test);
         
         System.out.println("\nModel Selection\n");
         EnhancedLinearPerceptron modelSelection = new EnhancedLinearPerceptron(true);
         modelSelection.buildClassifier(train);
         
-        
+        testModel(modelSelection, test);
     }
     
     /**
@@ -89,5 +84,18 @@ public class Main {
             System.out.println("Unable to read file. Exception: " + e);
         }
         return i;
+    }
+    
+    
+    public static void testModel(Classifier model, Instances test) throws Exception{
+        int correct = 0;
+        for(int i = 0; i < test.numInstances(); i++){ // for each test isntance
+            // if classifier c predicts the class of test instance i correctly
+            if(model.classifyInstance(test.instance(i))==test.instance(i).classValue()){
+                correct++;   // if correct, add 1 to the count. Do nothing otherwise
+            }
+        }
+        System.out.println(correct+" correct out of " + test.numInstances());
+        System.out.println((((double)correct / test.numInstances()) * 100)+"%");
     }
 }

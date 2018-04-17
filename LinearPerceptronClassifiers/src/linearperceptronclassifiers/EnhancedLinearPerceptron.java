@@ -14,6 +14,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.AttributeStats;
 import weka.core.Capabilities;
+import weka.core.Capabilities.Capability;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -95,8 +96,17 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             // Number of folds for crossvalidation
             int folds = 8;
             evalOnline.crossValidateModel(online, instances, folds, new Random(1));
+            evalOffline.crossValidateModel(offline, instances, folds, new Random(1));
+            //evalOnline.evaluateModel(online, instances);
+            System.out.println("Online error: " + evalOnline.errorRate());
+            System.out.println("Offline error: " + evalOffline.errorRate());
             
-            
+            if(evalOnline.errorRate() <= evalOffline.errorRate()){
+                perceptronTraining(instances);
+            }
+            else{
+                gradientDescentTraining(instances);
+            }
         }
         else{
             // Standardise attributes if flag is set to true, assign train to
@@ -133,7 +143,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         }
         
         
-        System.out.println("Pred: " + y + ". Actual: " + instance.value(2));
+        //System.out.println("Pred: " + y + ". Actual: " + instance.value(2));
         return y;
     }
 
@@ -149,17 +159,18 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
 //        return null;
 //    }
 
-//    @Override
-//    public Capabilities getCapabilities() {
-//        //throw new UnsupportedOperationException("Not supported yet.");
-//        try{
-//            System.out.println("Needs doing");
-//        }
-//        catch(Exception e){
-//            System.out.println("Needs doing too");
-//        }
-//        return null;
-//    }
+    @Override
+    public Capabilities getCapabilities() {
+        Capabilities result = super.getCapabilities();
+        result.disableAll();
+
+        result.enable(Capability.NUMERIC_ATTRIBUTES);
+        result.enable(Capability.NOMINAL_ATTRIBUTES);
+        result.enable(Capability.NOMINAL_CLASS);
+        result.setMinimumNumberInstances(2);
+
+        return result;
+    }
     
     /**
      * Return the y value (either 1 or -1) using a threshold of 0
@@ -249,7 +260,6 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             w[1] = tw[1];
             // Increment the number of iterations
             iterations++;
-            System.out.println(iterations);
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
     
