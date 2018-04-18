@@ -14,8 +14,15 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         // Load data
-        Instances train = loadData("data.arff");
-        Instances test = loadData("RandomTestData.arff");
+        //Instances train = loadData("data.arff");
+        //Instances test = loadData("data.arff");
+        Instances train = loadData("ForML/bank.arff");
+        Instances test = loadData("ForML/bank.arff");
+        /*int trainSize = (int) Math.round(bank.numInstances() * 0.8);
+        int testSize = bank.numInstances() - trainSize;
+        Instances train = new Instances(bank, 0, trainSize);
+        Instances test = new Instances(bank, trainSize, testSize);*/
+        
         
         System.out.println("Linear Perceptron: \n");
         // Create instance of LinearPerceptron classifer
@@ -23,9 +30,7 @@ public class Main {
         // Build classifier
         linearPerceptron.buildClassifier(train);
         // Classify instances
-        for(int i = 0; i < train.numInstances(); i++){
-            linearPerceptron.classifyInstance(train.instance(i));
-        }
+        testModel(linearPerceptron, test);
         
         System.out.println("\nEnhanced Linear Perceptron (online, no standardisation): \n");
         // Create instance of EnhancedLinearPerceptron classifer

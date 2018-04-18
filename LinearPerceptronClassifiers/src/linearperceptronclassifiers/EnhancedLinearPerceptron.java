@@ -8,6 +8,7 @@
  */
 package linearperceptronclassifiers;
 
+import java.util.Arrays;
 import java.util.Random;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
@@ -85,7 +86,9 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         Instances newInstances;
         // To do: check that attributes are continuous and not discrete
         
-        
+        // Initialise weights
+        w = new double[instances.numAttributes()-1];
+        Arrays.fill(w, 1);
         
         if(MODEL_SELECTION){
             // Create classifiers and Evaluation objects
@@ -130,11 +133,16 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         double y;
         // Standardise attributes if flag = true
         if(STANDARDISE_FLAG){
-            double x1 = (instance.value(0) - means[0]) / stdDev[0];
-            double x2 = (instance.value(1) - means[1]) / stdDev[1];
-            double calc = w[0] * x1 + w[1] * x2 + bias;
-            y = (calc >= 0) ? 1 : -1;
-            //System.out.println("Calc = " + calc + ". y = " + y);
+            //double x1 = (instance.value(0) - means[0]) / stdDev[0];
+            //double x2 = (instance.value(1) - means[1]) / stdDev[1];
+            //double calc = w[0] * x1 + w[1] * x2 + bias;
+            //y = (calc >= 0) ? 1 : -1;
+            
+            double calc = 0;
+            for(int i = 0; i < instance.numAttributes()-1; i++){
+                calc += w[i] * instance.value(i);
+            }
+            y = (calc >= 0) ? 1 : 0;
         }
         else {
             y = calculateY(instance);
@@ -174,11 +182,18 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @return 1 or -1
      */
     private int calculateY(Instance i){
-        double x1 = i.value(0);
-        double x2 = i.value(1);
-        double calc = w[0] * x1 + w[1] * x2 + bias;
+        //double x1 = i.value(0);
+        //double x2 = i.value(1);
+        //double calc = w[0] * x1 + w[1] * x2 + bias;
         //System.out.println(calc);
-        return(calc >= 0) ? 1 : -1;
+        //return(calc >= 0) ? 1 : -1;
+        
+        double calc = 0;
+        for (int j = 0; j < i.numAttributes()-1; j++) {
+            calc += w[j] * i.value(j);
+        }
+        calc += bias;
+        return(calc >= 0) ? 1 : 0;
     }
     
     
@@ -189,11 +204,16 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @return an array containing the two updated weights
      */
     private double[] calculateWeights(Instance i, double y){
-        double tw[] = new double[2]; // temporary weights
-        tw[0] = w[0] + (0.5*ETA) * (i.value(2) - y) * i.value(0);
-        tw[1] = w[1] + (0.5*ETA) * (i.value(2) - y) * i.value(1);
-        bias = bias + (0.5*ETA) * (i.value(2) - y);
-        return tw;   
+        //double tw[] = new double[2]; // temporary weights
+        //tw[0] = w[0] + (0.5*ETA) * (i.value(2) - y) * i.value(0);
+        //tw[1] = w[1] + (0.5*ETA) * (i.value(2) - y) * i.value(1);
+        //bias = bias + (0.5*ETA) * (i.value(2) - y);
+        //return tw;   
+        double tw[] = new double[w.length];
+        for(int j = 0; j < w.length; j++){
+            tw[j] = w[j] + (0.5*ETA) * (i.classValue() - y) * i.value(j);
+        }
+        return tw;
     }
     
     /**
@@ -214,10 +234,12 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
                 // Calculate new weights and store in temporary array
                 double[] tw = calculateWeights(train.instance(i), y);
                 // Check that weights haven't changed
-                count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
+                //count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
+                count = (Arrays.equals(tw, w)) ? count+1 : count*0;
                 // Assign temporary weights to w[]
-                w[0] = tw[0];
-                w[1] = tw[1];
+                w = tw;
+                //w[0] = tw[0];
+                //w[1] = tw[1];
                 // Increment the number of iterations
                 iterations++;
             }

@@ -4,6 +4,7 @@
  */
 package linearperceptronclassifiers;
 
+import java.util.Arrays;
 import weka.classifiers.Classifier;
 import weka.core.Capabilities;
 import weka.core.Instance;
@@ -39,7 +40,9 @@ public class LinearPerceptron implements Classifier{
     public void buildClassifier(Instances train) throws Exception {
         // To do: check that instances are continuous and not discrete
         
-        
+        // Initialise weights
+        w = new double[train.numAttributes()-1];
+        Arrays.fill(w, 1);
         // Initialise count; used to check that a full pass has been made 
         // through the dataset without a change in y or w
         int count = 0;
@@ -49,9 +52,9 @@ public class LinearPerceptron implements Classifier{
             // Loop through each row of the data
             for(int i = 0; i < train.numInstances(); i++){
                 // Determine y
-                double y = calculateY(w, train.instance(i));
+                double y = calculateY(train.instance(i));
                 // Calculate new weights
-                double[] tempWeights = calculateWeights(w, train.instance(i), y);
+                double[] tempWeights = calculateWeights(train.instance(i), y);
                 // Check that weights haven't changed
                 if(tempWeights[0] == w[0] && tempWeights[1] == w[1]) count++;
                 else count = 0;
@@ -68,8 +71,8 @@ public class LinearPerceptron implements Classifier{
     @Override
     public double classifyInstance(Instance i) throws Exception {
         // Get the class of the instance
-        double y = calculateY(w, i);
-        System.out.println("Pred: " + y + ". Actual: " + i.value(2));
+        double y = calculateY(i);
+        //System.out.println("Pred: " + y + ". Actual: " + i.value(i.classIndex()));
         return y;
     }
 
@@ -89,11 +92,19 @@ public class LinearPerceptron implements Classifier{
      * @param i the current instance in the training data
      * @return 1 or -1
      */
-    private static int calculateY(double[] w, Instance i){
-        double x = i.value(0);
-        double y = i.value(1);
-        double calc = w[0] * x + w[1] * y;
-        return(calc >= 0) ? 1 : -1;
+    private int calculateY(Instance i){
+        // Calculate y
+        double calc = 0;
+        for (int j = 0; j < i.numAttributes()-1; j++) {
+            calc += w[j] * i.value(j);
+        }
+        calc += bias;
+        
+        //double x = i.value(0);
+       // double y = i.value(1);
+        
+        //double calc = w[0] * x + w[1] * y;
+        return(calc >= 0) ? 1 : 0;
         
     }
     
@@ -114,15 +125,18 @@ public class LinearPerceptron implements Classifier{
     
     /**
      * Returns the new weights for the iteration
-     * @param w the current weights
      * @param i the current instance
      * @param y the output
      * @return an array containing the two updated weights
      */
-    private static double[] calculateWeights(double[] w, Instance i, double y){
-        double tw[] = new double[2]; // temporary weights
-        tw[0] = w[0] + (0.5*ETA) * (i.value(2) - y) * i.value(0);
-        tw[1] = w[1] + (0.5*ETA) * (i.value(2) - y) * i.value(1);
+    private double[] calculateWeights(Instance i, double y){
+        double tw[] = new double[w.length];
+        for(int j = 0; j < w.length; j++){
+            tw[j] = w[j] + (0.5*ETA) * (i.classValue() - y) * i.value(j);
+        }
+        //double tw[] = new double[2]; // temporary weights
+        //tw[0] = w[0] + (0.5*ETA) * (i.value(2) - y) * i.value(0);
+        //tw[1] = w[1] + (0.5*ETA) * (i.value(2) - y) * i.value(1);
         return tw;       
     }
     
