@@ -26,7 +26,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
     private double[] w; // Variable for weights
     private double bias;
     private final static int ETA = 1; // Variable for learning rate
-    private final int MAX_ITERATIONS = 100;
+    private final int MAX_ITERATIONS = 1000;
     private boolean STANDARDISE_FLAG;
     private boolean ONLINE_RULE;
     private boolean MODEL_SELECTION;
@@ -37,7 +37,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      *  Default constructor for the LinearPerceptron classifier
      */
     public EnhancedLinearPerceptron() {
-        this.w = new double[]{1, 1};
+        //this.w = new double[]{1, 1};
         this.bias = 0;
         this.STANDARDISE_FLAG = false;
         this.ONLINE_RULE = true;
@@ -49,7 +49,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @param bias
      */
     public EnhancedLinearPerceptron(double bias) {
-        this.w = new double[]{1, 1};
+        //this.w = new double[]{1, 1};
         this.bias = bias;
         this.STANDARDISE_FLAG = false;
         this.ONLINE_RULE = true;
@@ -62,7 +62,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @param modelSelection 
      */
     public EnhancedLinearPerceptron(boolean modelSelection) {
-        this.w = new double[]{1, 1};
+        //this.w = new double[]{1, 1};
         this.bias = 0;
         this.MODEL_SELECTION = modelSelection;
     }
@@ -97,11 +97,14 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
             Evaluation evalOffline = new Evaluation(instances);
             // Number of folds for crossvalidation
-            int folds = 8;
+            //int folds = (instances.numInstances() < 10) ? 10 : instances.numInstances();
+            int folds = instances.numInstances();
             // Cross-validate
             evalOnline.crossValidateModel(online, instances, folds, new Random(1));
             evalOffline.crossValidateModel(offline, instances, folds, new Random(1));
             //evalOnline.evaluateModel(online, instances);
+            System.out.println("Online correct: " + evalOnline.pctCorrect());
+            System.out.println("Offline correct: " + evalOffline.pctCorrect());
             System.out.println("Online error: " + evalOnline.errorRate());
             System.out.println("Offline error: " + evalOffline.errorRate());
             
@@ -235,12 +238,13 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
                 double[] tw = calculateWeights(train.instance(i), y);
                 // Check that weights haven't changed
                 //count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
-                count = (Arrays.equals(tw, w)) ? count+1 : count*0;
+                count = (Arrays.equals(tw, w)) ? count+1 : 0;
                 // Assign temporary weights to w[]
                 w = tw;
                 //w[0] = tw[0];
                 //w[1] = tw[1];
                 // Increment the number of iterations
+                if(count == train.numInstances()) break;
                 iterations++;
             }
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
@@ -256,27 +260,31 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         
         do{
             // Initialise delta w to zeroes
-            double dw[] = new double[]{0,0};
+            double dw[] = new double[train.numAttributes()-1];
+            Arrays.fill(dw, 0);
             for(int i = 0; i < train.numInstances(); i++){
                 Instance in = train.instance(i);
                 // Calculate y
                 double y = calculateY(in);
                 // Calculate deltaW
                 for(int j = 0; j < dw.length; j++){
-                    dw[j] = dw[j] + (0.5*ETA) * (in.value(2) - y) * in.value(j);
+                    dw[j] = dw[j] + (0.5*ETA) * (in.classValue() - y) * in.value(j);
                 }
             }
             // Update weights
-            double[] tw = new double[2]; // temporary weights
+            double[] tw = new double[train.numAttributes()-1]; // temporary weights
             for(int j = 0; j < dw.length; j++){
                 tw[j] = w[j] + dw[j];
             }
             // Check that weights haven't changed
-            count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
+            //count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
+            count = (Arrays.equals(tw, w)) ? count+1 : 0;
             // Assign temporary weights to w[]
-            w[0] = tw[0];
-            w[1] = tw[1];
+            w = tw;
+            //w[0] = tw[0];
+            //w[1] = tw[1];
             // Increment the number of iterations
+            if(count == train.numInstances()) break;
             iterations++;
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
@@ -291,16 +299,10 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             means[i] = attributeStats.numericStats.mean;
             stdDev[i] = attributeStats.numericStats.stdDev;
             for(int j = 0; j < standardised.numInstances(); j++){
-                standardised.get(j).setValue(i, (standardised.get(j).value(i) - means[i]) / 
-                        stdDev[i]);
+                standardised.get(j).setValue(i, (standardised.get(j).value(i) 
+                        - means[i]) / stdDev[i]);
             }
         }
         return standardised;
     }
-    
-    /*private double crossValidation(Instances instances){
-        int folds = 10;
-        double acc = 0, bestAcc = 0;
-        
-    }*/
 }

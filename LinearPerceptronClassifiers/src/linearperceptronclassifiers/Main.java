@@ -4,7 +4,9 @@
 package linearperceptronclassifiers;
 
 import java.io.FileReader;
+import java.util.Random;
 import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
 import weka.core.Instances;
 
 /**
@@ -16,8 +18,8 @@ public class Main {
         // Load data
         //Instances train = loadData("data.arff");
         //Instances test = loadData("data.arff");
-        Instances train = loadData("ForML/bank.arff");
-        Instances test = loadData("ForML/bank.arff");
+        Instances train = loadData("ForML/blood.arff");
+        Instances test = loadData("ForML/blood.arff");
         /*int trainSize = (int) Math.round(bank.numInstances() * 0.8);
         int testSize = bank.numInstances() - trainSize;
         Instances train = new Instances(bank, 0, trainSize);
@@ -70,6 +72,8 @@ public class Main {
         modelSelection.buildClassifier(train);
         
         testModel(modelSelection, test);
+        
+        
     }
     
     /**

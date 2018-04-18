@@ -17,7 +17,7 @@ public class LinearPerceptron implements Classifier{
     private double[] w; // Variable for weights
     private final double bias;
     private final static int ETA = 1; // Variable for learning rate
-    private final int MAX_ITERATIONS = 100;
+    private final int MAX_ITERATIONS = 1000;
     
     /**
      *  Default constructor for the LinearPerceptron classifier
@@ -54,14 +54,16 @@ public class LinearPerceptron implements Classifier{
                 // Determine y
                 double y = calculateY(train.instance(i));
                 // Calculate new weights
-                double[] tempWeights = calculateWeights(train.instance(i), y);
+                double[] tw = calculateWeights(train.instance(i), y);
                 // Check that weights haven't changed
-                if(tempWeights[0] == w[0] && tempWeights[1] == w[1]) count++;
-                else count = 0;
+                count = (Arrays.equals(tw, w)) ? count+1 : 0;
                 // Assign temporary weights to w[]
-                w[0] = tempWeights[0];
-                w[1] = tempWeights[1];
+                w = tw;
                 // Increment the number of iterations
+                if(count == train.numInstances()) {
+                    System.out.println("Here");
+                    break;
+                }
                 iterations++;
             }
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
