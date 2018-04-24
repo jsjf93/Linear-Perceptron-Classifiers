@@ -25,7 +25,7 @@ import weka.core.Instances;
 public class EnhancedLinearPerceptron extends AbstractClassifier{
     private double[] w; // Variable for weights
     private double bias;
-    private final static int ETA = 1; // Variable for learning rate
+    private final int ETA = 1; // Variable for learning rate
     private final int MAX_ITERATIONS = 1000;
     private boolean STANDARDISE_FLAG;
     private boolean ONLINE_RULE;
@@ -75,7 +75,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @param onlineRule 
      */
     public EnhancedLinearPerceptron(double bias, boolean standardiseFlag, boolean onlineRule) {
-        this.w = new double[]{1, 1};
+        //this.w = new double[]{1, 1};
         this.bias = bias;
         this.STANDARDISE_FLAG = standardiseFlag;
         this.ONLINE_RULE = onlineRule;
@@ -89,7 +89,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         // Initialise weights
         w = new double[instances.numAttributes()-1];
         Arrays.fill(w, 1);
-        
+        // Could try duplicating instances
         if(MODEL_SELECTION){
             // Create classifiers and Evaluation objects
             EnhancedLinearPerceptron online = new EnhancedLinearPerceptron();
@@ -97,8 +97,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
             Evaluation evalOffline = new Evaluation(instances);
             // Number of folds for crossvalidation
-            //int folds = (instances.numInstances() < 10) ? 10 : instances.numInstances();
-            int folds = instances.numInstances();
+            int folds = (instances.numInstances() > 10) ? 10 : instances.numInstances();
             // Cross-validate
             evalOnline.crossValidateModel(online, instances, folds, new Random(1));
             evalOffline.crossValidateModel(offline, instances, folds, new Random(1));
@@ -147,7 +146,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             }
             y = (calc >= 0) ? 1 : 0;
         }
-        else {
+        else{
             y = calculateY(instance);
         }
         //System.out.println("Pred: " + y + ". Actual: " + instance.value(2));
