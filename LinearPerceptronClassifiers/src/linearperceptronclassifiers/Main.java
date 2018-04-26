@@ -4,6 +4,7 @@
 package linearperceptronclassifiers;
 
 import java.io.FileReader;
+import java.util.Collections;
 import java.util.Random;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -18,66 +19,80 @@ public class Main {
         // Load data
         //Instances train = loadData("data.arff");
         //Instances test = loadData("data.arff");
-        Instances train = loadData("ForML/blood.arff");
-        Instances test = loadData("ForML/blood.arff");
-        /*int trainSize = (int) Math.round(bank.numInstances() * 0.8);
-        int testSize = bank.numInstances() - trainSize;
-        Instances train = new Instances(bank, 0, trainSize);
-        Instances test = new Instances(bank, trainSize, testSize);*/
+        Instances dataset = loadData("ForML/congressional-voting.arff");
+        Instances test = loadData("ForML/congressional-voting.arff");
         
         
-//        System.out.println("Linear Perceptron: \n");
-//        // Create instance of LinearPerceptron classifer
-//        LinearPerceptron linearPerceptron = new LinearPerceptron();
-//        // Build classifier
-//        linearPerceptron.buildClassifier(train);
-//        // Classify instances
-//        testModel(linearPerceptron, test);
-//        
-//        System.out.println("\nEnhanced Linear Perceptron (online, no standardisation): \n");
-//        // Create instance of EnhancedLinearPerceptron classifer
-//        double bias = 0;
-//        boolean standardise = false;
-//        boolean onlineRule = true;
-//        EnhancedLinearPerceptron eln = new EnhancedLinearPerceptron(bias, standardise, onlineRule);
-//        // Build classifier
-//        eln.buildClassifier(train);
-//        // Classify instances
-//        testModel(eln, test);
-//        
-//        System.out.println("\nEnhanced Linear Perceptron (online, standardisation): \n");
-//        // Create instance of EnhancedLinearPerceptron classifer
-//        bias = -0.5;
-//        standardise = true;
-//        onlineRule = true;
-//        EnhancedLinearPerceptron eln1 = new EnhancedLinearPerceptron(bias, standardise, onlineRule);
-//        // Build classifier
-//        eln1.buildClassifier(train);
-//        // Classify instances
-//        testModel(eln1, test);
-//        
-//        System.out.println("\nEnhanced Linear Perceptron (off-line): \n");
-//        // Create instance of EnhancedLinearPerceptron classifer
-//        bias = 0;
-//        standardise = false;
-//        onlineRule = false;
-//        EnhancedLinearPerceptron eln2 = new EnhancedLinearPerceptron(bias, standardise, onlineRule);
-//        // Build classifier
-//        eln2.buildClassifier(train);
-//        // Classify instances
-//        testModel(eln2, test);
-//        
-//        System.out.println("\nModel Selection\n");
-//        EnhancedLinearPerceptron modelSelection = new EnhancedLinearPerceptron(true);
-//        modelSelection.buildClassifier(train);
-//        
-//        testModel(modelSelection, test);
+        
+        System.out.println("Linear Perceptron: \n");
+        // Create instance of LinearPerceptron classifer
+        LinearPerceptron linearPerceptron = new LinearPerceptron();
+        // Build classifier
+        linearPerceptron.buildClassifier(dataset);
+        // Classify instances
+        testModel(linearPerceptron, test);
+        
+        System.out.println("\nEnhanced Linear Perceptron (online, no standardisation): \n");
+        // Create instance of EnhancedLinearPerceptron classifer
+        double bias = 0;
+        boolean standardise = false;
+        boolean onlineRule = true;
+        EnhancedLinearPerceptron eln = new EnhancedLinearPerceptron(bias, standardise, onlineRule);
+        // Build classifier
+        eln.buildClassifier(dataset);
+        // Classify instances
+        testModel(eln, test);
+        
+        System.out.println("\nEnhanced Linear Perceptron (online, standardisation): \n");
+        // Create instance of EnhancedLinearPerceptron classifer
+        bias = -0.5;
+        standardise = true;
+        onlineRule = true;
+        EnhancedLinearPerceptron eln1 = new EnhancedLinearPerceptron(bias, standardise, onlineRule);
+        // Build classifier
+        eln1.buildClassifier(dataset);
+        // Classify instances
+        testModel(eln1, test);
+        
+        System.out.println("\nEnhanced Linear Perceptron (off-line): \n");
+        // Create instance of EnhancedLinearPerceptron classifer
+        bias = 0;
+        standardise = false;
+        onlineRule = false;
+        EnhancedLinearPerceptron eln2 = new EnhancedLinearPerceptron(bias, standardise, onlineRule);
+        // Build classifier
+        eln2.buildClassifier(dataset);
+        // Classify instances
+        testModel(eln2, test);
+        
+        System.out.println("\nModel Selection\n");
+        EnhancedLinearPerceptron modelSelection = new EnhancedLinearPerceptron(true);
+        modelSelection.buildClassifier(dataset);
+        testModel(modelSelection, test);
 
-        System.out.println("\nEnsemble\n");
-        LinearPerceptronEnsemble lpe = new LinearPerceptronEnsemble();
-        lpe.buildClassifier(train);
-        testModel(lpe, test);
+//        System.out.println("\nEnsemble\n");
+//        LinearPerceptronEnsemble lpe = new LinearPerceptronEnsemble();
+//        lpe.buildClassifier(dataset);
+//        testModel(lpe, test);
         
+        
+        System.out.println("\nEvaluation\n");
+        double average = 0, correct = 0;
+        for (int i = 0; i < dataset.numInstances(); i++) {
+            // Create train and test datasets
+            Instances[] split = generateDatasets(dataset);
+            // Build classifier
+            eln1.buildClassifier(split[0]);
+            // Test the model
+            correct = testModel(eln1, split[1]);
+            correct = (correct / split[1].numInstances()) * 100;
+            //System.out.println((((double)correct / split[1].numInstances()) * 100)+"%");
+            System.out.println("Correct: " + correct + "%");
+            average += correct;;
+            
+        }
+        average /= dataset.numInstances();
+        System.out.println("Average: " + average + "%");
     }
     
     /**
@@ -100,7 +115,7 @@ public class Main {
     }
     
     
-    public static void testModel(Classifier model, Instances test) throws Exception{
+    public static int testModel(Classifier model, Instances test) throws Exception{
         int correct = 0;
         for(int i = 0; i < test.numInstances(); i++){ // for each test isntance
             // if classifier c predicts the class of test instance i correctly
@@ -108,7 +123,21 @@ public class Main {
                 correct++;   // if correct, add 1 to the count. Do nothing otherwise
             }
         }
-        System.out.println(correct+" correct out of " + test.numInstances());
-        System.out.println((((double)correct / test.numInstances()) * 100)+"%");
+        //System.out.println(correct+" correct out of " + test.numInstances());
+        //System.out.println((((double)correct / test.numInstances()) * 100)+"%");
+        return correct;
+    }
+    
+    public static Instances[] generateDatasets(Instances dataset){
+        Instances[] split = new Instances[2];
+        // Shuffle dataset
+        Collections.shuffle(dataset);
+        // Set the train/test split sizes
+        int trainSize = (int)Math.round(dataset.numInstances() * 0.5);
+        int testSize = dataset.numInstances() - trainSize;
+        // Create train/test sets
+        split[0] = new Instances(dataset, 0, trainSize);
+        split[1] = new Instances(dataset, trainSize, testSize);
+        return split;
     }
 }

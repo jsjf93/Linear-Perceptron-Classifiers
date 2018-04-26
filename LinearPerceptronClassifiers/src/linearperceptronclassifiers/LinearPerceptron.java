@@ -61,21 +61,17 @@ public class LinearPerceptron implements Classifier{
                 w = tw;
                 // Increment the number of iterations
                 if(count == train.numInstances()) {
-                    System.out.println("Here");
                     break;
                 }
                 iterations++;
             }
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
-        
     }
 
     @Override
     public double classifyInstance(Instance i) throws Exception {
         // Get the class of the instance
-        double y = calculateY(i);
-        //System.out.println("Pred: " + y + ". Actual: " + i.value(i.classIndex()));
-        return y;
+        return calculateY(i);
     }
 
     @Override
@@ -101,28 +97,8 @@ public class LinearPerceptron implements Classifier{
             calc += w[j] * i.value(j);
         }
         calc += bias;
-        
-        //double x = i.value(0);
-       // double y = i.value(1);
-        
-        //double calc = w[0] * x + w[1] * y;
         return(calc >= 0) ? 1 : 0;
         
-    }
-    
-    /**
-     * Return the y value (either 1 or 0) using a threshold of 0.
-     * Overloaded to allow the inclusion of the bias term.
-     * @param w the weights
-     * @param i the current instance in the training data
-     * @param bias the bias variable
-     * @return 1 or -1
-     */
-    private static int calculateY(double[] w, Instance i, double bias){
-        double x = i.value(0);
-        double y = i.value(1);
-        double calc = w[0] * x + w[1] * y + bias;
-        return(calc >= 0) ? 1 : -1;
     }
     
     /**
@@ -136,9 +112,6 @@ public class LinearPerceptron implements Classifier{
         for(int j = 0; j < w.length; j++){
             tw[j] = w[j] + (0.5*ETA) * (i.classValue() - y) * i.value(j);
         }
-        //double tw[] = new double[2]; // temporary weights
-        //tw[0] = w[0] + (0.5*ETA) * (i.value(2) - y) * i.value(0);
-        //tw[1] = w[1] + (0.5*ETA) * (i.value(2) - y) * i.value(1);
         return tw;       
     }
     

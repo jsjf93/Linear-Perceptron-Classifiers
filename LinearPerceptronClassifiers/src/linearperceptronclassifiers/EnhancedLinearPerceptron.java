@@ -91,28 +91,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         Arrays.fill(w, 1);
         // Could try duplicating instances
         if(MODEL_SELECTION){
-            // Create classifiers and Evaluation objects
-            EnhancedLinearPerceptron online = new EnhancedLinearPerceptron();
-            Evaluation evalOnline = new Evaluation(instances);
-            EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
-            Evaluation evalOffline = new Evaluation(instances);
-            // Number of folds for crossvalidation
-            int folds = (instances.numInstances() > 10) ? 10 : instances.numInstances();
-            // Cross-validate
-            evalOnline.crossValidateModel(online, instances, folds, new Random(1));
-            evalOffline.crossValidateModel(offline, instances, folds, new Random(1));
-            //evalOnline.evaluateModel(online, instances);
-            System.out.println("Online correct: " + evalOnline.pctCorrect());
-            System.out.println("Offline correct: " + evalOffline.pctCorrect());
-            System.out.println("Online error: " + evalOnline.errorRate());
-            System.out.println("Offline error: " + evalOffline.errorRate());
-            
-            if(evalOnline.errorRate() <= evalOffline.errorRate()){
-                perceptronTraining(instances);
-            }
-            else{
-                gradientDescentTraining(instances);
-            }
+            modelSelection(instances);
         }
         else{
             // Standardise attributes if flag is set to true, assign train to
@@ -142,8 +121,10 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             
             double calc = 0;
             for(int i = 0; i < instance.numAttributes()-1; i++){
-                calc += w[i] * instance.value(i);
+                double x = (instance.value(i) - means[i]) / stdDev[i];
+                calc += w[i] * x;
             }
+            calc += bias;
             y = (calc >= 0) ? 1 : 0;
         }
         else{
@@ -165,18 +146,18 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
 //        return null;
 //    }
 
-    @Override
-    public Capabilities getCapabilities() {
-        Capabilities result = super.getCapabilities();
-        result.disableAll();
-
-        result.enable(Capability.NUMERIC_ATTRIBUTES);
-        result.enable(Capability.NOMINAL_ATTRIBUTES);
-        result.enable(Capability.NOMINAL_CLASS);
-        result.setMinimumNumberInstances(2);
-
-        return result;
-    }
+//    @Override
+//    public Capabilities getCapabilities() {
+//        Capabilities result = super.getCapabilities();
+//        result.disableAll();
+//
+//        result.enable(Capability.NUMERIC_ATTRIBUTES);
+//        result.enable(Capability.NOMINAL_ATTRIBUTES);
+//        result.enable(Capability.NOMINAL_CLASS);
+//        result.setMinimumNumberInstances(2);
+//
+//        return result;
+//    }
     
     /**
      * Return the y value (either 1 or -1) using a threshold of 0
@@ -303,5 +284,34 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             }
         }
         return standardised;
+    }
+    
+    private void modelSelection(Instances instances){
+        // Create classifiers and Evaluation object
+        EnhancedLinearPerceptron online = new EnhancedLinearPerceptron();
+        EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
+        
+        try{
+            Evaluation eval = new Evaluation(instances);
+            // Number of folds for crossvalidation
+            int folds = (instances.numInstances() > 10) ? 10 : instances.numInstances();
+            // Cross-validate
+            eval.crossValidateModel(online, instances, folds, new Random(1));
+            double onlineErrorRate = eval.errorRate();
+            //System.out.println("Online error: " + eval.errorRate());
+            eval.crossValidateModel(offline, instances, folds, new Random(1));
+            double offlineErrorRate = eval.errorRate();
+            //System.out.println("Offline correct: " + eval.errorRate());
+            if(onlineErrorRate <= offlineErrorRate){
+                perceptronTraining(instances);
+            }
+            else{
+                gradientDescentTraining(instances);
+            }
+        }
+        catch(Exception e){
+            System.out.println("Could not compare the error rates. " +
+                    "Exception: " + e);
+        }
     }
 }

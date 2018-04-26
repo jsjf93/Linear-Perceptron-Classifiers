@@ -24,8 +24,8 @@ import weka.filters.unsupervised.attribute.Remove;
  * @author Joshua Foster
  */
 public class LinearPerceptronEnsemble extends AbstractClassifier{
-    private List<LinearPerceptron> ensembleList;
-    private int[][] attributesList;
+    private final List<LinearPerceptron> ensembleList;
+    private final int[][] attributesList;
     private final int ENSEMBLE_SIZE;
     private final double PROPORTION;
     
@@ -101,8 +101,8 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
      * @return subset
      */
     private Instances createSubset(Instances i, int index){
+        // Filter out unused attributes
         Instances subset = filterAttributes(i, index);
-        
         // Randomise the subset
         Collections.shuffle(subset);
         // Get the number of instances to remove
@@ -110,7 +110,6 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
         for(int j = subset.numInstances()-1; j>= num; j--){
             subset.remove(j);
         }
-        
         return subset;
     }
     
@@ -187,7 +186,6 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
                 System.out.println("Could not classify instance. Exception: " + e);
             }
         }
-        
         // Get votes
         for (double classification : classifications) {
             if (classification == 1) {
@@ -202,6 +200,13 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
         return (classA >= classB) ? 1 : 0;
     } 
     
+    
+//    @Override
+//    public double[] distributionForInstance(Instance i){
+//        double[] dist = new double[i.numClasses()];
+//        double classification = classifyInstance(i);
+//        //Instances instances = this.m
+//    }
     
     
     private void print(double[] array){
