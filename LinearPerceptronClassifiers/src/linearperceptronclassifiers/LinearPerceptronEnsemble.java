@@ -1,6 +1,10 @@
 /*
  * An implementation of the Linear Perceptron that conists of an ensemble of
  * LinearPerceptron classifiers.
+
+
+// TO DO: Could just stick the class value at the end of attributes array
+// instead of double arraycopy
  */
 package linearperceptronclassifiers;
 
@@ -9,8 +13,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import weka.classifiers.AbstractClassifier;
 import weka.core.DenseInstance;
@@ -24,10 +26,11 @@ import weka.filters.unsupervised.attribute.Remove;
  * @author Joshua Foster
  */
 public class LinearPerceptronEnsemble extends AbstractClassifier{
-    private final List<LinearPerceptron> ensembleList;
+    private final List<EnhancedLinearPerceptron> ensembleList;
     private final int[][] attributesList;
     private final int ENSEMBLE_SIZE;
     private final double PROPORTION;
+    private double[] voteProportions;
     
     /**
      * Default constructor for the Ensemble
@@ -37,6 +40,7 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
         ENSEMBLE_SIZE = 50;
         PROPORTION = 0.5;
         attributesList = new int[ENSEMBLE_SIZE][];
+        //voteProportions = new double[2];
     }
     
     /**
@@ -50,6 +54,7 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
         ENSEMBLE_SIZE = size;
         PROPORTION = proportion;
         attributesList = new int[ENSEMBLE_SIZE][];
+        //voteProportions = new double[2];
     }
     
     /**
@@ -151,7 +156,7 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
             // Create instance subsets
             Instances subset = createSubset(new Instances(train), i); 
             // Create instance of classifier
-            LinearPerceptron perceptron = new LinearPerceptron();
+            EnhancedLinearPerceptron perceptron = new EnhancedLinearPerceptron();
             // Build classifier
             perceptron.buildClassifier(subset);
             // Add perceptron to ensemble
@@ -168,15 +173,24 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
     @Override
     public double classifyInstance(Instance i){
         double[] classifications = new double[ENSEMBLE_SIZE];
-        int classA = 0, classB = 0;
+        voteProportions = new double[2];
         // Go through each classifier 
         for(int j = 0; j < ENSEMBLE_SIZE; j++){
             // Retrieve the attributes relating to the current classifier
             int[] attributes = attributesList[j];
-            // Remove unwanted attributes
+            Arrays.sort(attributes);
             Instance instance = new DenseInstance(i);
-            for (int k = 0; k < attributes.length-1; k++) {
-                instance.deleteAttributeAt(attributes[k]);
+            // Remove unwanted attributes
+            // a starts at the last element before the class index
+            for(int a = i.numAttributes()-2; a >= 0; a--){
+                boolean flag = false;
+                for(int b = 0; b < attributes.length-1; b++){
+                    if(a == attributes[b]){
+                        flag = true;
+                        break;
+                    }
+                }
+                if(!flag) instance.deleteAttributeAt(a); 
             }
             // Classify
             try{
@@ -188,25 +202,18 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
         }
         // Get votes
         for (double classification : classifications) {
-            if (classification == 1) {
-                classA++;
-            } 
-            else {
-                classB++;
-            }
+            if (classification == 1) voteProportions[0]++; 
+            else voteProportions[1]++; 
         }
-        //System.out.println("Class A: " + classA);
-        //System.out.println("Class B: " + classB);
-        return (classA >= classB) ? 1 : 0;
+        return (voteProportions[0] >= voteProportions[1]) ? 1 : 0;
     } 
     
     
-//    @Override
-//    public double[] distributionForInstance(Instance i){
-//        double[] dist = new double[i.numClasses()];
-//        double classification = classifyInstance(i);
-//        //Instances instances = this.m
-//    }
+    @Override
+    public double[] distributionForInstance(Instance i){
+        classifyInstance(i);
+        return voteProportions;
+    }
     
     
     private void print(double[] array){

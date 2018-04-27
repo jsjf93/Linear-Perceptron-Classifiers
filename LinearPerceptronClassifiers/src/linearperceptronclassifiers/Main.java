@@ -4,6 +4,7 @@
 package linearperceptronclassifiers;
 
 import java.io.FileReader;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 import weka.classifiers.Classifier;
@@ -19,20 +20,24 @@ public class Main {
         // Load data
         //Instances train = loadData("data.arff");
         //Instances test = loadData("data.arff");
-        Instances dataset = loadData("ForML/congressional-voting.arff");
-        Instances test = loadData("ForML/congressional-voting.arff");
+        Instances dataset = loadData("ForML/blood.arff");
+        //Instances test = loadData("ForML/blood.arff");
+        
+        double average = 0, correct = 0;
         
         
-        
-        System.out.println("Linear Perceptron: \n");
+        System.out.println("Linear Perceptron:");
         // Create instance of LinearPerceptron classifer
         LinearPerceptron linearPerceptron = new LinearPerceptron();
         // Build classifier
         linearPerceptron.buildClassifier(dataset);
         // Classify instances
-        testModel(linearPerceptron, test);
+        //testModel(linearPerceptron, test);
+        correct = testModel(linearPerceptron, dataset);
+        correct = (correct / dataset.numInstances()) * 100;
+        System.out.printf("Correct: %.2f%%\n", correct);
         
-        System.out.println("\nEnhanced Linear Perceptron (online, no standardisation): \n");
+        System.out.println("\nEnhanced Linear Perceptron (online, no standardisation):");
         // Create instance of EnhancedLinearPerceptron classifer
         double bias = 0;
         boolean standardise = false;
@@ -41,9 +46,11 @@ public class Main {
         // Build classifier
         eln.buildClassifier(dataset);
         // Classify instances
-        testModel(eln, test);
+        correct = testModel(eln, dataset);
+        correct = (correct / dataset.numInstances()) * 100;
+        System.out.printf("Correct: %.2f%%\n", correct);
         
-        System.out.println("\nEnhanced Linear Perceptron (online, standardisation): \n");
+        System.out.println("\nEnhanced Linear Perceptron (online, standardisation):");
         // Create instance of EnhancedLinearPerceptron classifer
         bias = -0.5;
         standardise = true;
@@ -52,9 +59,11 @@ public class Main {
         // Build classifier
         eln1.buildClassifier(dataset);
         // Classify instances
-        testModel(eln1, test);
+        correct = testModel(eln1, dataset);
+        correct = (correct / dataset.numInstances()) * 100;
+        System.out.printf("Correct: %.2f%%\n", correct);
         
-        System.out.println("\nEnhanced Linear Perceptron (off-line): \n");
+        System.out.println("\nEnhanced Linear Perceptron (off-line):");
         // Create instance of EnhancedLinearPerceptron classifer
         bias = 0;
         standardise = false;
@@ -63,21 +72,30 @@ public class Main {
         // Build classifier
         eln2.buildClassifier(dataset);
         // Classify instances
-        testModel(eln2, test);
+        correct = testModel(eln2, dataset);
+        correct = (correct / dataset.numInstances()) * 100;
+        System.out.printf("Correct: %.2f%%\n", correct);
         
-        System.out.println("\nModel Selection\n");
+        System.out.println("\nModel Selection:");
         EnhancedLinearPerceptron modelSelection = new EnhancedLinearPerceptron(true);
         modelSelection.buildClassifier(dataset);
-        testModel(modelSelection, test);
+        correct = testModel(modelSelection, dataset);
+        correct = (correct / dataset.numInstances()) * 100;
+        System.out.printf("Correct: %.2f%%\n", correct);
 
-//        System.out.println("\nEnsemble\n");
-//        LinearPerceptronEnsemble lpe = new LinearPerceptronEnsemble();
-//        lpe.buildClassifier(dataset);
-//        testModel(lpe, test);
+        System.out.println("\nEnsemble:");
+        LinearPerceptronEnsemble lpe = new LinearPerceptronEnsemble();
+        lpe.buildClassifier(dataset);
+        correct = testModel(lpe, dataset);
+        correct = (correct / dataset.numInstances()) * 100;
+        System.out.printf("Correct: %.2f%%\n", correct);
+        
+        System.out.println("\nEnsemble (distribution for instance):");
+        getEnsembleClassVotes(lpe, dataset);
         
         
-        System.out.println("\nEvaluation\n");
-        double average = 0, correct = 0;
+        // ClassifyInstance
+        System.out.println("\nEvaluation:");
         for (int i = 0; i < dataset.numInstances(); i++) {
             // Create train and test datasets
             Instances[] split = generateDatasets(dataset);
@@ -86,14 +104,18 @@ public class Main {
             // Test the model
             correct = testModel(eln1, split[1]);
             correct = (correct / split[1].numInstances()) * 100;
-            //System.out.println((((double)correct / split[1].numInstances()) * 100)+"%");
-            System.out.println("Correct: " + correct + "%");
-            average += correct;;
-            
+            //System.out.printf("Correct: %.2f%%\n", correct);
+            average += correct;
         }
         average /= dataset.numInstances();
-        System.out.println("Average: " + average + "%");
+        System.out.printf("Average: %.2f%%\n", average);
+        
+        
+        
+        
     }
+    
+    
     
     /**
      * A method that takes a file path as a String and reads the data into an
@@ -117,15 +139,23 @@ public class Main {
     
     public static int testModel(Classifier model, Instances test) throws Exception{
         int correct = 0;
-        for(int i = 0; i < test.numInstances(); i++){ // for each test isntance
+        for(int i = 0; i < test.numInstances(); i++){ // for each test instance
             // if classifier c predicts the class of test instance i correctly
             if(model.classifyInstance(test.instance(i))==test.instance(i).classValue()){
-                correct++;   // if correct, add 1 to the count. Do nothing otherwise
+                correct++;   // if correct, add 1 to the count
             }
         }
         //System.out.println(correct+" correct out of " + test.numInstances());
         //System.out.println((((double)correct / test.numInstances()) * 100)+"%");
         return correct;
+    }
+    
+    public static void getEnsembleClassVotes(Classifier model, Instances test) throws Exception{
+        for (int i = 0; i < test.numInstances(); i++) {
+            double[] dist = model.distributionForInstance(test.instance(i));
+            //System.out.println("Distribution: " + dist[0] + "/" + dist[1]);
+            //System.out.printf("Distribution (1, 0): %.0f / %.0f \n", dist[0], dist[1]);
+        }
     }
     
     public static Instances[] generateDatasets(Instances dataset){
@@ -139,5 +169,10 @@ public class Main {
         split[0] = new Instances(dataset, 0, trainSize);
         split[1] = new Instances(dataset, trainSize, testSize);
         return split;
+    }
+    
+    
+    public static void writeCSV(String fileName){
+        
     }
 }
