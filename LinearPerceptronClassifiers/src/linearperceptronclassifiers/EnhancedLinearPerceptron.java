@@ -8,6 +8,7 @@
  */
 package linearperceptronclassifiers;
 
+import java.util.Arrays;
 import java.util.Random;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
@@ -24,8 +25,8 @@ import weka.core.Instances;
 public class EnhancedLinearPerceptron extends AbstractClassifier{
     private double[] w; // Variable for weights
     private double bias;
-    private final static int ETA = 1; // Variable for learning rate
-    private final int MAX_ITERATIONS = 100;
+    private final int ETA = 1; // Variable for learning rate
+    private final int MAX_ITERATIONS = 1000;
     private boolean STANDARDISE_FLAG;
     private boolean ONLINE_RULE;
     private boolean MODEL_SELECTION;
@@ -36,7 +37,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      *  Default constructor for the LinearPerceptron classifier
      */
     public EnhancedLinearPerceptron() {
-        this.w = new double[]{1, 1};
+        //this.w = new double[]{1, 1};
         this.bias = 0;
         this.STANDARDISE_FLAG = false;
         this.ONLINE_RULE = true;
@@ -48,7 +49,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @param bias
      */
     public EnhancedLinearPerceptron(double bias) {
-        this.w = new double[]{1, 1};
+        //this.w = new double[]{1, 1};
         this.bias = bias;
         this.STANDARDISE_FLAG = false;
         this.ONLINE_RULE = true;
@@ -61,7 +62,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @param modelSelection 
      */
     public EnhancedLinearPerceptron(boolean modelSelection) {
-        this.w = new double[]{1, 1};
+        //this.w = new double[]{1, 1};
         this.bias = 0;
         this.MODEL_SELECTION = modelSelection;
     }
@@ -74,7 +75,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @param onlineRule 
      */
     public EnhancedLinearPerceptron(double bias, boolean standardiseFlag, boolean onlineRule) {
-        this.w = new double[]{1, 1};
+        //this.w = new double[]{1, 1};
         this.bias = bias;
         this.STANDARDISE_FLAG = standardiseFlag;
         this.ONLINE_RULE = onlineRule;
@@ -85,29 +86,12 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         Instances newInstances;
         // To do: check that attributes are continuous and not discrete
         
-        
-        
+        // Initialise weights
+        w = new double[instances.numAttributes()-1];
+        Arrays.fill(w, 1);
+        // Could try duplicating instances
         if(MODEL_SELECTION){
-            // Create classifiers and Evaluation objects
-            EnhancedLinearPerceptron online = new EnhancedLinearPerceptron();
-            Evaluation evalOnline = new Evaluation(instances);
-            EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
-            Evaluation evalOffline = new Evaluation(instances);
-            // Number of folds for crossvalidation
-            int folds = 8;
-            // Cross-validate
-            evalOnline.crossValidateModel(online, instances, folds, new Random(1));
-            evalOffline.crossValidateModel(offline, instances, folds, new Random(1));
-            //evalOnline.evaluateModel(online, instances);
-            System.out.println("Online error: " + evalOnline.errorRate());
-            System.out.println("Offline error: " + evalOffline.errorRate());
-            
-            if(evalOnline.errorRate() <= evalOffline.errorRate()){
-                perceptronTraining(instances);
-            }
-            else{
-                gradientDescentTraining(instances);
-            }
+            modelSelection(instances);
         }
         else{
             // Standardise attributes if flag is set to true, assign train to
@@ -130,13 +114,15 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         double y;
         // Standardise attributes if flag = true
         if(STANDARDISE_FLAG){
-            double x1 = (instance.value(0) - means[0]) / stdDev[0];
-            double x2 = (instance.value(1) - means[1]) / stdDev[1];
-            double calc = w[0] * x1 + w[1] * x2 + bias;
-            y = (calc >= 0) ? 1 : -1;
-            //System.out.println("Calc = " + calc + ". y = " + y);
+            double calc = 0;
+            for(int i = 0; i < instance.numAttributes()-1; i++){
+                double x = (instance.value(i) - means[i]) / stdDev[i];
+                calc += w[i] * x;
+            }
+            calc += bias;
+            y = (calc >= 0) ? 1 : 0;
         }
-        else {
+        else{
             y = calculateY(instance);
         }
         //System.out.println("Pred: " + y + ". Actual: " + instance.value(2));
@@ -155,18 +141,18 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
 //        return null;
 //    }
 
-    @Override
-    public Capabilities getCapabilities() {
-        Capabilities result = super.getCapabilities();
-        result.disableAll();
-
-        result.enable(Capability.NUMERIC_ATTRIBUTES);
-        result.enable(Capability.NOMINAL_ATTRIBUTES);
-        result.enable(Capability.NOMINAL_CLASS);
-        result.setMinimumNumberInstances(2);
-
-        return result;
-    }
+//    @Override
+//    public Capabilities getCapabilities() {
+//        Capabilities result = super.getCapabilities();
+//        result.disableAll();
+//
+//        result.enable(Capability.NUMERIC_ATTRIBUTES);
+//        result.enable(Capability.NOMINAL_ATTRIBUTES);
+//        result.enable(Capability.NOMINAL_CLASS);
+//        result.setMinimumNumberInstances(2);
+//
+//        return result;
+//    }
     
     /**
      * Return the y value (either 1 or -1) using a threshold of 0
@@ -174,11 +160,18 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @return 1 or -1
      */
     private int calculateY(Instance i){
-        double x1 = i.value(0);
-        double x2 = i.value(1);
-        double calc = w[0] * x1 + w[1] * x2 + bias;
+        //double x1 = i.value(0);
+        //double x2 = i.value(1);
+        //double calc = w[0] * x1 + w[1] * x2 + bias;
         //System.out.println(calc);
-        return(calc >= 0) ? 1 : -1;
+        //return(calc >= 0) ? 1 : -1;
+        
+        double calc = 0;
+        for (int j = 0; j < i.numAttributes()-1; j++) {
+            calc += w[j] * i.value(j);
+        }
+        calc += bias;
+        return(calc >= 0) ? 1 : 0;
     }
     
     
@@ -189,11 +182,16 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @return an array containing the two updated weights
      */
     private double[] calculateWeights(Instance i, double y){
-        double tw[] = new double[2]; // temporary weights
-        tw[0] = w[0] + (0.5*ETA) * (i.value(2) - y) * i.value(0);
-        tw[1] = w[1] + (0.5*ETA) * (i.value(2) - y) * i.value(1);
-        bias = bias + (0.5*ETA) * (i.value(2) - y);
-        return tw;   
+        //double tw[] = new double[2]; // temporary weights
+        //tw[0] = w[0] + (0.5*ETA) * (i.value(2) - y) * i.value(0);
+        //tw[1] = w[1] + (0.5*ETA) * (i.value(2) - y) * i.value(1);
+        //bias = bias + (0.5*ETA) * (i.value(2) - y);
+        //return tw;   
+        double tw[] = new double[w.length];
+        for(int j = 0; j < w.length; j++){
+            tw[j] = w[j] + (0.5*ETA) * (i.classValue() - y) * i.value(j);
+        }
+        return tw;
     }
     
     /**
@@ -214,11 +212,14 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
                 // Calculate new weights and store in temporary array
                 double[] tw = calculateWeights(train.instance(i), y);
                 // Check that weights haven't changed
-                count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
+                //count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
+                count = (Arrays.equals(tw, w)) ? count+1 : 0;
                 // Assign temporary weights to w[]
-                w[0] = tw[0];
-                w[1] = tw[1];
+                w = tw;
+                //w[0] = tw[0];
+                //w[1] = tw[1];
                 // Increment the number of iterations
+                if(count == train.numInstances()) break;
                 iterations++;
             }
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
@@ -234,27 +235,31 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         
         do{
             // Initialise delta w to zeroes
-            double dw[] = new double[]{0,0};
+            double dw[] = new double[train.numAttributes()-1];
+            Arrays.fill(dw, 0);
             for(int i = 0; i < train.numInstances(); i++){
                 Instance in = train.instance(i);
                 // Calculate y
                 double y = calculateY(in);
                 // Calculate deltaW
                 for(int j = 0; j < dw.length; j++){
-                    dw[j] = dw[j] + (0.5*ETA) * (in.value(2) - y) * in.value(j);
+                    dw[j] = dw[j] + (0.5*ETA) * (in.classValue() - y) * in.value(j);
                 }
             }
             // Update weights
-            double[] tw = new double[2]; // temporary weights
+            double[] tw = new double[train.numAttributes()-1]; // temporary weights
             for(int j = 0; j < dw.length; j++){
                 tw[j] = w[j] + dw[j];
             }
             // Check that weights haven't changed
-            count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
+            //count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
+            count = (Arrays.equals(tw, w)) ? count+1 : 0;
             // Assign temporary weights to w[]
-            w[0] = tw[0];
-            w[1] = tw[1];
+            w = tw;
+            //w[0] = tw[0];
+            //w[1] = tw[1];
             // Increment the number of iterations
+            if(count == train.numInstances()) break;
             iterations++;
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
@@ -269,16 +274,39 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             means[i] = attributeStats.numericStats.mean;
             stdDev[i] = attributeStats.numericStats.stdDev;
             for(int j = 0; j < standardised.numInstances(); j++){
-                standardised.get(j).setValue(i, (standardised.get(j).value(i) - means[i]) / 
-                        stdDev[i]);
+                standardised.get(j).setValue(i, (standardised.get(j).value(i) 
+                        - means[i]) / stdDev[i]);
             }
         }
         return standardised;
     }
     
-    /*private double crossValidation(Instances instances){
-        int folds = 10;
-        double acc = 0, bestAcc = 0;
+    private void modelSelection(Instances instances){
+        // Create classifiers and Evaluation object
+        EnhancedLinearPerceptron online = new EnhancedLinearPerceptron();
+        EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
         
-    }*/
+        try{
+            Evaluation eval = new Evaluation(instances);
+            // Number of folds for crossvalidation
+            int folds = (instances.numInstances() > 10) ? 10 : instances.numInstances();
+            // Cross-validate
+            eval.crossValidateModel(online, instances, folds, new Random(1));
+            double onlineErrorRate = eval.errorRate();
+            //System.out.println("Online error: " + eval.errorRate());
+            eval.crossValidateModel(offline, instances, folds, new Random(1));
+            double offlineErrorRate = eval.errorRate();
+            //System.out.println("Offline correct: " + eval.errorRate());
+            if(onlineErrorRate <= offlineErrorRate){
+                perceptronTraining(instances);
+            }
+            else{
+                gradientDescentTraining(instances);
+            }
+        }
+        catch(Exception e){
+            System.out.println("Could not compare the error rates. " +
+                    "Exception: " + e);
+        }
+    }
 }
