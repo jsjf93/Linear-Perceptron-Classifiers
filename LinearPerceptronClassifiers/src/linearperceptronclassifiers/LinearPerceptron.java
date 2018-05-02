@@ -5,6 +5,7 @@
 package linearperceptronclassifiers;
 
 import java.util.Arrays;
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.core.Capabilities;
 import weka.core.Instance;
@@ -13,10 +14,10 @@ import weka.core.Instances;
 /**
  * @author Joshua Foster
  */
-public class LinearPerceptron implements Classifier{
+public class LinearPerceptron extends AbstractClassifier{
     private double[] w; // Variable for weights
     private final double bias;
-    private final static int ETA = 1; // Variable for learning rate
+    private final int ETA = 1; // Variable for learning rate
     private final int MAX_ITERATIONS = 1000;
     
     /**
@@ -59,10 +60,11 @@ public class LinearPerceptron implements Classifier{
                 count = (Arrays.equals(tw, w)) ? count+1 : 0;
                 // Assign temporary weights to w[]
                 w = tw;
-                // Increment the number of iterations
+                // End the algorithm if a full pass has been made 
                 if(count == train.numInstances()) {
                     break;
                 }
+                // Increment the number of iterations
                 iterations++;
             }
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
@@ -74,15 +76,15 @@ public class LinearPerceptron implements Classifier{
         return calculateY(i);
     }
 
-    @Override
-    public double[] distributionForInstance(Instance instnc) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Capabilities getCapabilities() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+//    @Override
+//    public double[] distributionForInstance(Instance instnc) throws Exception {
+//        throw new UnsupportedOperationException("Not supported yet.");
+//    }
+//
+//    @Override
+//    public Capabilities getCapabilities() {
+//        throw new UnsupportedOperationException("Not supported yet.");
+//    }
     
     /**
      * Return the y value (either 1 or 0) using a threshold of 0

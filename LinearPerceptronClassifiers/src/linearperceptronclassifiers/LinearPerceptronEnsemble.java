@@ -26,7 +26,7 @@ import weka.filters.unsupervised.attribute.Remove;
  * @author Joshua Foster
  */
 public class LinearPerceptronEnsemble extends AbstractClassifier{
-    private final List<EnhancedLinearPerceptron> ensembleList;
+    private final List<LinearPerceptron> ensembleList;
     private final int[][] attributesList;
     private final int ENSEMBLE_SIZE;
     private final double PROPORTION;
@@ -156,7 +156,7 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
             // Create instance subsets
             Instances subset = createSubset(new Instances(train), i); 
             // Create instance of classifier
-            EnhancedLinearPerceptron perceptron = new EnhancedLinearPerceptron();
+            LinearPerceptron perceptron = new LinearPerceptron();
             // Build classifier
             perceptron.buildClassifier(subset);
             // Add perceptron to ensemble

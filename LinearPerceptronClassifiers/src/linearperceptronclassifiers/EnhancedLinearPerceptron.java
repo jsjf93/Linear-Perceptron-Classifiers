@@ -114,11 +114,6 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         double y;
         // Standardise attributes if flag = true
         if(STANDARDISE_FLAG){
-            //double x1 = (instance.value(0) - means[0]) / stdDev[0];
-            //double x2 = (instance.value(1) - means[1]) / stdDev[1];
-            //double calc = w[0] * x1 + w[1] * x2 + bias;
-            //y = (calc >= 0) ? 1 : -1;
-            
             double calc = 0;
             for(int i = 0; i < instance.numAttributes()-1; i++){
                 double x = (instance.value(i) - means[i]) / stdDev[i];

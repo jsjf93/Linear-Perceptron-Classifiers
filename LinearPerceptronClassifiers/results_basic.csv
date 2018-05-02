@@ -1,0 +1,154 @@
+Classifier,Data,numInstances,numAttributes,Accuracy(%),Time(nano)
+Linear Perceptron,arffstoprocess/acute-inflammation.arff,120,7,99.8888888888889,70917
+Enhanced Perceptron(Online),arffstoprocess/acute-inflammation.arff,120,7,99.91666666666667,21219
+Enhanced Perceptron(Online/Standard),arffstoprocess/acute-inflammation.arff,120,7,99.93055555555556,71690
+Enhanced Perceptron(Offline),arffstoprocess/acute-inflammation.arff,120,7,99.44444444444444,1655560
+Enhanced Perceptron(Offline/Standard),arffstoprocess/acute-inflammation.arff,120,7,99.79166666666667,298380
+Ensemble (Enhanced/Online/Standard),arffstoprocess/acute-inflammation.arff,120,7,56.6527777777778,11239472
+Multilayer Perceptron,arffstoprocess/acute-inflammation.arff,120,7,100.0,62552198
+SMO,arffstoprocess/acute-inflammation.arff,120,7,100.0,10776985
+VotedPeceptron,arffstoprocess/acute-inflammation.arff,120,7,97.27777777777777,194360
+Linear Perceptron,arffstoprocess/acute-nephritis.arff,120,7,100.0,15226
+Enhanced Perceptron(Online),arffstoprocess/acute-nephritis.arff,120,7,100.0,10435
+Enhanced Perceptron(Online/Standard),arffstoprocess/acute-nephritis.arff,120,7,99.40277777777777,78641
+Enhanced Perceptron(Offline),arffstoprocess/acute-nephritis.arff,120,7,99.80555555555556,384524
+Enhanced Perceptron(Offline/Standard),arffstoprocess/acute-nephritis.arff,120,7,99.13888888888887,422719
+Ensemble (Enhanced/Online/Standard),arffstoprocess/acute-nephritis.arff,120,7,92.65277777777779,2731231
+Multilayer Perceptron,arffstoprocess/acute-nephritis.arff,120,7,100.0,60213045
+SMO,arffstoprocess/acute-nephritis.arff,120,7,100.0,6935493
+VotedPeceptron,arffstoprocess/acute-nephritis.arff,120,7,98.36111111111111,146257
+Linear Perceptron,arffstoprocess/balloons.arff,16,5,67.96875,113923
+Enhanced Perceptron(Online),arffstoprocess/balloons.arff,16,5,67.96875,61820
+Enhanced Perceptron(Online/Standard),arffstoprocess/balloons.arff,16,5,61.71875,69176
+Enhanced Perceptron(Offline),arffstoprocess/balloons.arff,16,5,67.1875,1537592
+Enhanced Perceptron(Offline/Standard),arffstoprocess/balloons.arff,16,5,59.375,1544513
+Ensemble (Enhanced/Online/Standard),arffstoprocess/balloons.arff,16,5,53.90625,4305789
+Multilayer Perceptron,arffstoprocess/balloons.arff,16,5,64.0625,5789610
+SMO,arffstoprocess/balloons.arff,16,5,57.03125,2163788
+VotedPeceptron,arffstoprocess/balloons.arff,16,5,63.28125,45611
+Linear Perceptron,arffstoprocess/blood.arff,748,5,57.0083502530813,71220
+Enhanced Perceptron(Online),arffstoprocess/blood.arff,748,5,57.59208155795135,66594
+Enhanced Perceptron(Online/Standard),arffstoprocess/blood.arff,748,5,66.88030827304182,161487
+Enhanced Perceptron(Offline),arffstoprocess/blood.arff,748,5,54.24697589293379,14591168
+Enhanced Perceptron(Offline/Standard),arffstoprocess/blood.arff,748,5,54.67342503360115,11678277
+Ensemble (Enhanced/Online/Standard),arffstoprocess/blood.arff,748,5,75.07220681174763,7122035
+Multilayer Perceptron,arffstoprocess/blood.arff,748,5,78.09309674282926,263298902
+SMO,arffstoprocess/blood.arff,748,5,76.19176985329854,10717431
+VotedPeceptron,arffstoprocess/blood.arff,748,5,77.59730046612708,1472236
+Linear Perceptron,arffstoprocess/breast-cancer-wisc-diag.arff,569,31,96.00175746924444,165644
+Enhanced Perceptron(Online),arffstoprocess/breast-cancer-wisc-diag.arff,569,31,96.05497660833197,182598
+Enhanced Perceptron(Online/Standard),arffstoprocess/breast-cancer-wisc-diag.arff,569,31,95.97329141810457,1750284
+Enhanced Perceptron(Offline),arffstoprocess/breast-cancer-wisc-diag.arff,569,31,95.73194881061431,36659276
+Enhanced Perceptron(Offline/Standard),arffstoprocess/breast-cancer-wisc-diag.arff,569,31,95.63541176761805,36629393
+Ensemble (Enhanced/Online/Standard),arffstoprocess/breast-cancer-wisc-diag.arff,569,31,89.89578949974013,26441058
+Multilayer Perceptron,arffstoprocess/breast-cancer-wisc-diag.arff,569,31,96.13233000816875,2186695188
+SMO,arffstoprocess/breast-cancer-wisc-diag.arff,569,31,97.0116834575115,5825105
+VotedPeceptron,arffstoprocess/breast-cancer-wisc-diag.arff,569,31,96.25671427510588,509718
+Linear Perceptron,arffstoprocess/breast-cancer-wisc-prog.arff,198,34,55.72900724415878,196178
+Enhanced Perceptron(Online),arffstoprocess/breast-cancer-wisc-prog.arff,198,34,56.27486991123358,166149
+Enhanced Perceptron(Online/Standard),arffstoprocess/breast-cancer-wisc-prog.arff,198,34,58.57055402509952,762847
+Enhanced Perceptron(Offline),arffstoprocess/breast-cancer-wisc-prog.arff,198,34,56.23915926946235,14742286
+Enhanced Perceptron(Offline/Standard),arffstoprocess/breast-cancer-wisc-prog.arff,198,34,58.59096010611161,15226922
+Ensemble (Enhanced/Online/Standard),arffstoprocess/breast-cancer-wisc-prog.arff,198,34,62.55994286297315,13847671
+Multilayer Perceptron,arffstoprocess/breast-cancer-wisc-prog.arff,198,34,74.95153555759619,862458800
+SMO,arffstoprocess/breast-cancer-wisc-prog.arff,198,34,76.92072237526784,3282515
+VotedPeceptron,arffstoprocess/breast-cancer-wisc-prog.arff,198,34,71.31415161718196,339139
+Linear Perceptron,arffstoprocess/breast-cancer-wisc.arff,699,10,95.48269939455038,85478
+Enhanced Perceptron(Online),arffstoprocess/breast-cancer-wisc.arff,699,10,95.6339592787075,83919
+Enhanced Perceptron(Online/Standard),arffstoprocess/breast-cancer-wisc.arff,699,10,95.52328131469007,288989
+Enhanced Perceptron(Offline),arffstoprocess/breast-cancer-wisc.arff,699,10,95.45154559727136,18316032
+Enhanced Perceptron(Offline/Standard),arffstoprocess/breast-cancer-wisc.arff,699,10,95.49663661964877,16837880
+Ensemble (Enhanced/Online/Standard),arffstoprocess/breast-cancer-wisc.arff,699,10,96.37755122954998,9012847
+Multilayer Perceptron,arffstoprocess/breast-cancer-wisc.arff,699,10,95.51344327344412,457973388
+SMO,arffstoprocess/breast-cancer-wisc.arff,699,10,96.62145266877316,3636756
+VotedPeceptron,arffstoprocess/breast-cancer-wisc.arff,699,10,96.54438801234654,356194
+Linear Perceptron,arffstoprocess/breast-cancer.arff,286,10,56.371949728593115,59064
+Enhanced Perceptron(Online),arffstoprocess/breast-cancer.arff,286,10,56.42818719741799,59372
+Enhanced Perceptron(Online/Standard),arffstoprocess/breast-cancer.arff,286,10,59.75108807276639,174589
+Enhanced Perceptron(Offline),arffstoprocess/breast-cancer.arff,286,10,56.42574209007778,8884433
+Enhanced Perceptron(Offline/Standard),arffstoprocess/breast-cancer.arff,286,10,55.18118245390972,7170367
+Ensemble (Enhanced/Online/Standard),arffstoprocess/breast-cancer.arff,286,10,69.72957112817245,5359587
+Multilayer Perceptron,arffstoprocess/breast-cancer.arff,286,10,66.34065235463834,187931613
+SMO,arffstoprocess/breast-cancer.arff,286,10,70.10856276590535,4795950
+VotedPeceptron,arffstoprocess/breast-cancer.arff,286,10,68.92757592058287,344807
+Linear Perceptron,arffstoprocess/congressional-voting.arff,435,17,54.09926373218928,110623
+Enhanced Perceptron(Online),arffstoprocess/congressional-voting.arff,435,17,54.37576142804184,112301
+Enhanced Perceptron(Online/Standard),arffstoprocess/congressional-voting.arff,435,17,54.737009375496655,367761
+Enhanced Perceptron(Offline),arffstoprocess/congressional-voting.arff,435,17,55.044229037555084,20934292
+Enhanced Perceptron(Offline/Standard),arffstoprocess/congressional-voting.arff,435,17,55.46268340484137,16344306
+Ensemble (Enhanced/Online/Standard),arffstoprocess/congressional-voting.arff,435,17,58.26050108586258,8137529
+Multilayer Perceptron,arffstoprocess/congressional-voting.arff,435,17,58.53488002542505,630055600
+SMO,arffstoprocess/congressional-voting.arff,435,17,61.044546850998195,6535062
+VotedPeceptron,arffstoprocess/congressional-voting.arff,435,17,57.737168282218406,1270296
+Linear Perceptron,arffstoprocess/fertility.arff,100,10,47.32,54077
+Enhanced Perceptron(Online),arffstoprocess/fertility.arff,100,10,47.94,54452
+Enhanced Perceptron(Online/Standard),arffstoprocess/fertility.arff,100,10,58.36,84370
+Enhanced Perceptron(Offline),arffstoprocess/fertility.arff,100,10,47.14,2729597
+Enhanced Perceptron(Offline/Standard),arffstoprocess/fertility.arff,100,10,51.94,2583273
+Ensemble (Enhanced/Online/Standard),arffstoprocess/fertility.arff,100,10,87.46,3615316
+Multilayer Perceptron,arffstoprocess/fertility.arff,100,10,80.44,68966717
+SMO,arffstoprocess/fertility.arff,100,10,87.82,2613855
+VotedPeceptron,arffstoprocess/fertility.arff,100,10,79.84,71602
+Linear Perceptron,arffstoprocess/haberman-survival.arff,306,4,57.388184031782565,48446
+Enhanced Perceptron(Online),arffstoprocess/haberman-survival.arff,306,4,56.683326925541316,44798
+Enhanced Perceptron(Online/Standard),arffstoprocess/haberman-survival.arff,306,4,64.40258020419485,75918
+Enhanced Perceptron(Offline),arffstoprocess/haberman-survival.arff,306,4,53.90661711307596,4809768
+Enhanced Perceptron(Offline/Standard),arffstoprocess/haberman-survival.arff,306,4,52.61865094621713,4252076
+Ensemble (Enhanced/Online/Standard),arffstoprocess/haberman-survival.arff,306,4,73.63620829595453,4351117
+Multilayer Perceptron,arffstoprocess/haberman-survival.arff,306,4,73.57426630783029,81487784
+SMO,arffstoprocess/haberman-survival.arff,306,4,73.29659532658376,3653005
+VotedPeceptron,arffstoprocess/haberman-survival.arff,306,4,74.3090264428211,281128
+Linear Perceptron,arffstoprocess/ilpd-indian-liver.arff,583,10,52.68106075342016,64562
+Enhanced Perceptron(Online),arffstoprocess/ilpd-indian-liver.arff,583,10,52.97519053597641,63682
+Enhanced Perceptron(Online/Standard),arffstoprocess/ilpd-indian-liver.arff,583,10,57.461406518010364,305125
+Enhanced Perceptron(Offline),arffstoprocess/ilpd-indian-liver.arff,583,10,54.69340359439561,16340844
+Enhanced Perceptron(Offline/Standard),arffstoprocess/ilpd-indian-liver.arff,583,10,54.677488756461706,14206383
+Ensemble (Enhanced/Online/Standard),arffstoprocess/ilpd-indian-liver.arff,583,10,64.64017730308328,9188620
+Multilayer Perceptron,arffstoprocess/ilpd-indian-liver.arff,583,10,69.48182466564096,393508433
+SMO,arffstoprocess/ilpd-indian-liver.arff,583,10,71.35682834963137,8894463
+VotedPeceptron,arffstoprocess/ilpd-indian-liver.arff,583,10,70.48033338638282,1181082
+Linear Perceptron,arffstoprocess/pittsburg-bridges-T-OR-D.arff,102,8,54.97885428681279,44780
+Enhanced Perceptron(Online),arffstoprocess/pittsburg-bridges-T-OR-D.arff,102,8,54.57516339869284,46459
+Enhanced Perceptron(Online/Standard),arffstoprocess/pittsburg-bridges-T-OR-D.arff,102,8,62.76432141484048,75730
+Enhanced Perceptron(Offline),arffstoprocess/pittsburg-bridges-T-OR-D.arff,102,8,54.19069588619766,2338559
+Enhanced Perceptron(Offline/Standard),arffstoprocess/pittsburg-bridges-T-OR-D.arff,102,8,57.535563244905845,2363162
+Ensemble (Enhanced/Online/Standard),arffstoprocess/pittsburg-bridges-T-OR-D.arff,102,8,86.69742406766616,3412036
+Multilayer Perceptron,arffstoprocess/pittsburg-bridges-T-OR-D.arff,102,8,84.33294886582071,53195871
+SMO,arffstoprocess/pittsburg-bridges-T-OR-D.arff,102,8,86.69742406766615,2226180
+VotedPeceptron,arffstoprocess/pittsburg-bridges-T-OR-D.arff,102,8,82.00692041522485,83720
+Linear Perceptron,arffstoprocess/spect.arff,265,23,56.58090337335622,107364
+Enhanced Perceptron(Online),arffstoprocess/spect.arff,265,23,56.818181818181834,104679
+Enhanced Perceptron(Online/Standard),arffstoprocess/spect.arff,265,23,60.814751286449415,330675
+Enhanced Perceptron(Offline),arffstoprocess/spect.arff,265,23,53.44196683819332,13664224
+Enhanced Perceptron(Offline/Standard),arffstoprocess/spect.arff,265,23,58.76214979988565,13578621
+Ensemble (Enhanced/Online/Standard),arffstoprocess/spect.arff,265,23,59.61692395654662,7469052
+Multilayer Perceptron,arffstoprocess/spect.arff,265,23,65.11149228130357,625913089
+SMO,arffstoprocess/spect.arff,265,23,70.03144654088044,5425870
+VotedPeceptron,arffstoprocess/spect.arff,265,23,65.5717552887364,478622
+Linear Perceptron,arffstoprocess/statlog-australian-credit.arff,690,15,49.93404746901912,120366
+Enhanced Perceptron(Online),arffstoprocess/statlog-australian-credit.arff,690,15,50.02352446964922,116572
+Enhanced Perceptron(Online/Standard),arffstoprocess/statlog-australian-credit.arff,690,15,48.49989498004622,516795
+Enhanced Perceptron(Offline),arffstoprocess/statlog-australian-credit.arff,690,15,52.17895400126034,24585404
+Enhanced Perceptron(Offline/Standard),arffstoprocess/statlog-australian-credit.arff,690,15,52.3516068052931,23761248
+Ensemble (Enhanced/Online/Standard),arffstoprocess/statlog-australian-credit.arff,690,15,37.636210880067175,12390590
+Multilayer Perceptron,arffstoprocess/statlog-australian-credit.arff,690,15,59.54757403906741,826244440
+SMO,arffstoprocess/statlog-australian-credit.arff,690,15,67.83826927116118,21689798
+VotedPeceptron,arffstoprocess/statlog-australian-credit.arff,690,15,63.375341314849955,2351298
+Linear Perceptron,arffstoprocess/titanic.arff,2201,4,64.9307339639007,81095
+Enhanced Perceptron(Online),arffstoprocess/titanic.arff,2201,4,64.66255008054186,78414
+Enhanced Perceptron(Online/Standard),arffstoprocess/titanic.arff,2201,4,68.99310230886785,276492
+Enhanced Perceptron(Offline),arffstoprocess/titanic.arff,2201,4,62.75069183429014,33467587
+Enhanced Perceptron(Offline/Standard),arffstoprocess/titanic.arff,2201,4,62.82937507744412,30012969
+Ensemble (Enhanced/Online/Standard),arffstoprocess/titanic.arff,2201,4,74.99248275577216,16128008
+Multilayer Perceptron,arffstoprocess/titanic.arff,2201,4,77.78885630498539,586016318
+SMO,arffstoprocess/titanic.arff,2201,4,77.60972285324857,46627879
+VotedPeceptron,arffstoprocess/titanic.arff,2201,4,77.75618520507214,14152528
+Linear Perceptron,arffstoprocess/trains.arff,10,30,52.0,3392
+Enhanced Perceptron(Online),arffstoprocess/trains.arff,10,30,52.0,3633
+Enhanced Perceptron(Online/Standard),arffstoprocess/trains.arff,10,30,48.0,25201
+Enhanced Perceptron(Offline),arffstoprocess/trains.arff,10,30,62.0,10988
+Enhanced Perceptron(Offline/Standard),arffstoprocess/trains.arff,10,30,58.0,28436
+Ensemble (Enhanced/Online/Standard),arffstoprocess/trains.arff,10,30,50.0,4607217
+Multilayer Perceptron,arffstoprocess/trains.arff,10,30,70.0,36125469
+SMO,arffstoprocess/trains.arff,10,30,62.0,1973478
+VotedPeceptron,arffstoprocess/trains.arff,10,30,60.0,32841
