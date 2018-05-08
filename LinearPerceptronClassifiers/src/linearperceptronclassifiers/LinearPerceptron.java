@@ -24,7 +24,6 @@ public class LinearPerceptron extends AbstractClassifier{
      *  Default constructor for the LinearPerceptron classifier
      */
     public LinearPerceptron() {
-        this.w = new double[]{1, 1};
         this.bias = 0;
     }
     
@@ -33,14 +32,16 @@ public class LinearPerceptron extends AbstractClassifier{
      * @param bias 
      */
     public LinearPerceptron(double bias) {
-        this.w = new double[]{1, 1};
         this.bias = bias;
     }
 
+    /**
+     * Builds the classifier using the on-line learning algorithm.
+     * @param train
+     * @throws Exception 
+     */
     @Override
     public void buildClassifier(Instances train) throws Exception {
-        // To do: check that instances are continuous and not discrete
-        
         // Initialise weights
         w = new double[train.numAttributes()-1];
         Arrays.fill(w, 1);
@@ -70,21 +71,16 @@ public class LinearPerceptron extends AbstractClassifier{
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
 
+    /**
+     * Classifies the given instance as 0 or 1
+     * @param i
+     * @return
+     * @throws Exception 
+     */
     @Override
     public double classifyInstance(Instance i) throws Exception {
-        // Get the class of the instance
         return calculateY(i);
     }
-
-//    @Override
-//    public double[] distributionForInstance(Instance instnc) throws Exception {
-//        throw new UnsupportedOperationException("Not supported yet.");
-//    }
-//
-//    @Override
-//    public Capabilities getCapabilities() {
-//        throw new UnsupportedOperationException("Not supported yet.");
-//    }
     
     /**
      * Return the y value (either 1 or 0) using a threshold of 0
