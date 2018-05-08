@@ -1,21 +1,15 @@
 /*
  * An implementation of the standard online Linear Peceptron classifer and the
- * offline Perceptron algorithm
-
- * REMEMBER TO CHECK TERNARY OPERATION AND DELETE COMMENTED CODE
- * Might be able to reduce code a bit by not passing w[] to methods
- * It implements the Weka Classifier interface.
+ * offline Perceptron algorithm. It can also standardise attributes and perform
+ * model selection using cross validation to find the lesser of two error rates.
  */
 package linearperceptronclassifiers;
 
 import java.util.Arrays;
 import java.util.Random;
 import weka.classifiers.AbstractClassifier;
-import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.AttributeStats;
-import weka.core.Capabilities;
-import weka.core.Capabilities.Capability;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -74,13 +68,19 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @param standardiseFlag 
      * @param onlineRule 
      */
-    public EnhancedLinearPerceptron(double bias, boolean standardiseFlag, boolean onlineRule) {
+    public EnhancedLinearPerceptron(double bias, boolean standardiseFlag, 
+            boolean onlineRule) {
         //this.w = new double[]{1, 1};
         this.bias = bias;
         this.STANDARDISE_FLAG = standardiseFlag;
         this.ONLINE_RULE = onlineRule;
     }
 
+    /**
+     * Implementation of Wekas buildClassifier()
+     * @param instances
+     * @throws Exception 
+     */
     @Override
     public void buildClassifier(Instances instances) throws Exception {
         Instances newInstances;
@@ -96,9 +96,10 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         else{
             // Standardise attributes if flag is set to true, assign train to
             // instances otherwise
-            newInstances = (STANDARDISE_FLAG) ? standardiseAttributes(instances) : instances;
-            // Run the on-line perceptron algorithm if flag is true, otherwise use
-            // the off-line algorithm
+            newInstances = (STANDARDISE_FLAG) ? standardiseAttributes(instances) 
+                    : instances;
+            // Run the on-line perceptron algorithm if flag is true, otherwise
+            // use the off-line algorithm
             if(ONLINE_RULE){
                 perceptronTraining(newInstances);
             }
@@ -109,6 +110,14 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         
     }
 
+    /**
+     * Implementation of classifyInstance(). It starts by standardising
+     * attributes if the training set attributes were standardised.
+     * Finally it returns the predicted classification on the given instance
+     * @param instance
+     * @return
+     * @throws Exception 
+     */
     @Override
     public double classifyInstance(Instance instance) throws Exception {
         double y;
@@ -128,31 +137,6 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         //System.out.println("Pred: " + y + ". Actual: " + instance.value(2));
         return y;
     }
-
-//    @Override
-//    public double[] distributionForInstance(Instance instnc) throws Exception {
-//        //throw new UnsupportedOperationException("Not supported yet.");
-//        try{
-//            System.out.println("Needs doing");
-//        }
-//        catch(Exception e){
-//            System.out.println("Needs doing too");
-//        }
-//        return null;
-//    }
-
-//    @Override
-//    public Capabilities getCapabilities() {
-//        Capabilities result = super.getCapabilities();
-//        result.disableAll();
-//
-//        result.enable(Capability.NUMERIC_ATTRIBUTES);
-//        result.enable(Capability.NOMINAL_ATTRIBUTES);
-//        result.enable(Capability.NOMINAL_CLASS);
-//        result.setMinimumNumberInstances(2);
-//
-//        return result;
-//    }
     
     /**
      * Return the y value (either 1 or -1) using a threshold of 0
@@ -160,12 +144,6 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
      * @return 1 or -1
      */
     private int calculateY(Instance i){
-        //double x1 = i.value(0);
-        //double x2 = i.value(1);
-        //double calc = w[0] * x1 + w[1] * x2 + bias;
-        //System.out.println(calc);
-        //return(calc >= 0) ? 1 : -1;
-        
         double calc = 0;
         for (int j = 0; j < i.numAttributes()-1; j++) {
             calc += w[j] * i.value(j);
@@ -225,8 +203,10 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
     
-    
-    
+    /**
+     * The off-line training algorithm
+     * @param train 
+     */
     private void gradientDescentTraining(Instances train){
         // Initialise count; qused to check that a full pass has been made 
         // through the dataset without a change in y or w
@@ -243,27 +223,30 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
                 double y = calculateY(in);
                 // Calculate deltaW
                 for(int j = 0; j < dw.length; j++){
-                    dw[j] = dw[j] + (0.5*ETA) * (in.classValue() - y) * in.value(j);
+                    dw[j] = dw[j] + (0.5*ETA) * (in.classValue() - y) * 
+                            in.value(j);
                 }
             }
             // Update weights
-            double[] tw = new double[train.numAttributes()-1]; // temporary weights
+            double[] tw = new double[train.numAttributes()-1]; // temp weights
             for(int j = 0; j < dw.length; j++){
                 tw[j] = w[j] + dw[j];
             }
             // Check that weights haven't changed
-            //count = (tw[0] == w[0] && tw[1] == w[1]) ? count+1 : count*0;
             count = (Arrays.equals(tw, w)) ? count+1 : 0;
             // Assign temporary weights to w[]
             w = tw;
-            //w[0] = tw[0];
-            //w[1] = tw[1];
             // Increment the number of iterations
             if(count == train.numInstances()) break;
             iterations++;
         } while(count < train.numInstances() && iterations <= MAX_ITERATIONS);
     }
     
+    /**
+     * Returns Instances with standardised attributes
+     * @param train
+     * @return 
+     */
     private Instances standardiseAttributes(Instances train){
         Instances standardised = new Instances(train);
         means = new double[train.numAttributes()-1];
@@ -281,15 +264,23 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         return standardised;
     }
     
+    /**
+     * Performs cross validation on both the on-line and off-line algorithms. It
+     * then builds the classifier using the algorithm with the smallest error
+     * rate 
+     * @param instances 
+     */
     private void modelSelection(Instances instances){
         // Create classifiers and Evaluation object
         EnhancedLinearPerceptron online = new EnhancedLinearPerceptron();
-        EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, false, true);
+        EnhancedLinearPerceptron offline = new EnhancedLinearPerceptron(0, 
+                false, false);
         
         try{
             Evaluation eval = new Evaluation(instances);
             // Number of folds for crossvalidation
-            int folds = (instances.numInstances() > 10) ? 10 : instances.numInstances();
+            int folds = (instances.numInstances() > 10) ? 10 : 
+                    instances.numInstances();
             // Cross-validate
             eval.crossValidateModel(online, instances, folds, new Random(1));
             double onlineErrorRate = eval.errorRate();

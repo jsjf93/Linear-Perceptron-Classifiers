@@ -111,7 +111,8 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
         // Randomise the subset
         Collections.shuffle(subset);
         // Get the number of instances to remove
-        int num = subset.numInstances() - (int)Math.ceil(PROPORTION * (i.numInstances()));
+        int num = subset.numInstances() - (int)Math.ceil(PROPORTION * 
+                (i.numInstances()));
         for(int j = subset.numInstances()-1; j>= num; j--){
             subset.remove(j);
         }
@@ -136,12 +137,12 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
             subset = Filter.useFilter(i, attributeFilter);
         } 
         catch (Exception e) {
-            System.out.println("Unable to filter attributes. Caught exception: " + e);
+            System.out.println("Unable to filter attributes. Caught exception: " 
+                    + e);
         }
         
         return subset;
     }
-    
     
     /**
      * A method that builds each of the classifiers in the ensembleList
@@ -194,10 +195,12 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
             }
             // Classify
             try{
-                classifications[j] = ensembleList.get(j).classifyInstance(instance);
+                classifications[j] = 
+                        ensembleList.get(j).classifyInstance(instance);
             }
             catch(Exception e){
-                System.out.println("Could not classify instance. Exception: " + e);
+                System.out.println("Could not classify instance. Exception: " + 
+                        e);
             }
         }
         // Get votes
@@ -208,25 +211,14 @@ public class LinearPerceptronEnsemble extends AbstractClassifier{
         return (voteProportions[0] >= voteProportions[1]) ? 1 : 0;
     } 
     
-    
+    /**
+     * Returns the vote proportions obtained by classifyInstance()
+     * @param i
+     * @return 
+     */
     @Override
     public double[] distributionForInstance(Instance i){
         classifyInstance(i);
         return voteProportions;
-    }
-    
-    
-    private void print(double[] array){
-        for (int i = 0; i < array.length; i++) {
-            System.out.print(array[i] + " ");
-        }
-        System.out.println();
-    }
-    
-    private void print(int[] array){
-        for (int i = 0; i < array.length; i++) {
-            System.out.print(array[i] + " ");
-        }
-        System.out.println();
     }
 }
